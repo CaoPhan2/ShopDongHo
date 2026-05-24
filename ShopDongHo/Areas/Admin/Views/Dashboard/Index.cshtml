@@ -1,0 +1,259 @@
+﻿@using ShopDongHo.Models
+@model StatisticalModel
+@{
+    ViewData["Title"] = "Dashboard";
+    
+}
+
+<!Doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+</head>
+<body>
+<div class="dashboard">
+
+    <!-- HEADER -->
+    <div class="db-header">
+        <h1>Dashboard</h1>
+        <p>Tổng quan hoạt động hệ thống</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="db-card">
+                <p>Sản phẩm</p>
+                <h2>@ViewBag.countProducts</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="db-card">
+                <p>Đơn hàng</p>
+                <h2>@ViewBag.countOrders</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="db-card">
+                <p>Danh mục</p>
+                <h2>@ViewBag.countCategories</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="db-card">
+                <p>Người dùng</p>
+                <h2>@ViewBag.countUsers</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FILTER -->
+    <div class="db-filter">
+
+        <div class="row align-items-end">
+
+            <div class="col-md-3">
+                <label>Lọc nhanh</label>
+                <select class="db-select filter-select">
+                    <option value="30">-- Chọn khoảng --</option>
+                    <option value="7">7 ngày</option>
+                    <option value="30">30 ngày</option>
+                    <option value="90">3 tháng</option>
+                    <option value="365">1 năm</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label>Từ ngày</label>
+                <input type="date" class="db-input" id="date_from" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Đến ngày</label>
+                <input type="date" class="db-input" id="date_to" />
+            </div>
+
+            <div class="col-md-3">
+                <label>Lọc tùy chọn</label>
+                <button id="filterButton" class="btn-main">
+                    Lọc dữ liệu
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CHART -->
+    <div class="db-chart">
+        <h4>Biểu đồ thống kê</h4>
+        <div id="myfirstchart"></div>
+    </div>
+
+</div>
+    
+
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            var chart = new Morris.Area({
+                element: 'myfirstchart',
+                data: [],
+                xkey: 'date',
+                ykeys: ['sold', 'quantity', 'revenue', 'profit'],
+                labels: ['Bán', 'Đơn', 'Doanh thu', 'Lợi nhuận']
+            });
+
+            function updateChart(url, dataSend = {}) {
+                $.post(url, dataSend, function (data) {
+                    if (data) {
+                        chart.setData(data.map(x => ({
+                            date: x.date,
+                            sold: x.sold,
+                            quantity: x.quantity,
+                            revenue: x.revenue,
+                            profit: x.profit
+                        })));
+                    } else {
+                        chart.setData([]);
+                    }
+                });
+            }
+
+            // load lần đầu
+            updateChart('@Url.Action("GetChartData", "Dashboard")');
+
+            // filter nhanh
+            $('.filter-select').change(function () {
+                let days = $(this).val();
+                let end = new Date();
+                let start = new Date(end.getTime() - days * 86400000);
+
+                updateChart('@Url.Action("GetChartDataBySelect", "Dashboard")', {
+                    startDate: start.toISOString().split('T')[0],
+                    endDate: end.toISOString().split('T')[0]
+                });
+            });
+
+            // filter custom
+            $('#filterButton').click(function () {
+                updateChart('@Url.Action("FilterData", "Dashboard")', {
+                    fromDate: $('#date_from').val(),
+                    toDate: $('#date_to').val()
+                });
+            });
+
+        });
+    </script>
+}
+<style>
+    .dashboard {
+        padding: 25px;
+        background: #f7f9fc;
+        min-height: 100vh;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* HEADER */
+    .db-header h1 {
+        font-size: 26px;
+        font-weight: 600;
+        color: #0b1f3a;
+    }
+
+    .db-header p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    /* CARD */
+    .db-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        transition: 0.3s;
+    }
+
+        .db-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .db-card p {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .db-card h2 {
+            color: #0b1f3a;
+            font-size: 26px;
+        }
+
+    /* FILTER */
+    .db-filter {
+        margin-top: 25px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .db-select,
+    .db-input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-top: 5px;
+    }
+
+        .db-select:focus,
+        .db-input:focus {
+            border-color: #0b1f3a;
+            outline: none;
+        }
+
+    /* BUTTON */
+    .btn-main {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        background: #0b1f3a;
+        color: #fff;
+        transition: 0.3s;
+    }
+
+        .btn-main:hover {
+            background: #142f55;
+        }
+
+    /* CHART */
+    .db-chart {
+        margin-top: 25px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+        .db-chart h4 {
+            margin-bottom: 15px;
+            color: #0b1f3a;
+        }
+
+    #myfirstchart {
+        height: 250px;
+    }
+</style>

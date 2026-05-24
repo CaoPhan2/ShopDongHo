@@ -1,0 +1,38 @@
+﻿@using ShopDongHo.Models
+@model VnPayModel
+@{
+    ViewData["Title"] = "Payment Vnpay Info";
+
+}
+
+<body>
+    <h3>Payment Momo Info</h3>
+    <a class="btn btn-primary" asp-action="Index" asp-controller="Order">Back to Orders</a>
+    <table class="table" id="myTable">
+        <thead>
+            <tr>
+                <th scope="col">TransactionId</th>
+                <th scope="col">OrderDescription</th>
+                <th scope="col">OrderId</th>
+                <th scope="col">PaymentMethod</th>
+                <th scope="col">PaymentId</th>
+                <th scope="col">DateCreated</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr>
+                <td>@Model.TransactionId</td>
+                <td>@Model.OrderDescription</td>
+                <td>@Model.OrderId</td>
+                <td>@Model.PaymentMethod</td>
+                <td>@Model.PaymentId</td>
+                <td>@Model.DateCreated</td>
+                    
+            </tr>
+            
+
+
+        </tbody>
+    </table>
+</body>

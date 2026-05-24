@@ -1,0 +1,238 @@
+﻿@using ShopDongHo.Models
+@model ShippingModel
+@{
+    ViewData["Title"] = "Create Shipping";
+}
+
+<div class="container mt-4">
+
+    <!-- TITLE -->
+    <div class="page-header mb-4">
+        <h2>Tạo Phí Vận Chuyển</h2>
+        <p class="text-muted">Thiết lập phí vận chuyển theo khu vực</p>
+    </div>
+
+    <!-- FORM -->
+    <div class="card custom-card mb-4">
+        <div class="card-body">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label>Tỉnh/Thành phố</label>
+                    <select class="form-control custom-input" id="tinh">
+                        <option value="0">Chọn tỉnh thành</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>Quận/Huyện</label>
+                    <select class="form-control custom-input" id="quan">
+                        <option value="0">Chọn quận huyện</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label>Phường/Xã</label>
+                    <select class="form-control custom-input" id="phuong">
+                        <option value="0">Chọn phường xã</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Giá vận chuyển (VND)</label>
+                <input asp-for="Price" id="price_shipping" class="form-control custom-input" placeholder="Nhập giá..." />
+            </div>
+
+            <button type="button" class="btn btn-navy btn-add-shipping">
+                + Tạo Shipping
+            </button>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card custom-card">
+        <div class="card-body">
+            <h5 class="mb-3">Shipping list</h5>
+
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>Tỉnh</th>
+                        <th>Quận</th>
+                        <th>Phường</th>
+                        <th>Giá</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ViewBag.Shippings)
+                    {
+                        <tr>
+                            <td>@item.City</td>
+                            <td>@item.District</td>
+                            <td>@item.Ward</td>
+                            <td>@item.Price.ToString("#,##0 VND")</td>
+                            <td>
+                                <a onclick="return confirm('Bạn chắc chắn muốn xóa?')"
+                                   href="@Url.Action("Delete", "Shipping", new { id = item.Id })"
+                                   class="btn btn-danger btn-sm">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="mt-3">
+                <a asp-action="Index" asp-controller="Shipping" class="back-link">
+                    ← Trở lại danh sách phí vận chuyển
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+    <script>
+        $(".btn-add-shipping").click(function(){
+            var tinh = $("#tinh").find('option:selected').text();
+            var quan = $("#quan").find('option:selected').text();
+            var phuong = $("#phuong").find('option:selected').text();
+
+            var price  = $("#price_shipping").val();
+
+            if(tinh == '' || quan == '' || phuong == '' || price == ''){
+                Swal.fire("Vui lòng chọn đầy đủ thông tin");
+
+            }else{
+                $.ajax({
+                    url: '@Url.Action("StoreShipping", "Shipping")',
+                    type: 'POST',
+                    data: {
+                        tinh: tinh,
+                        quan: quan,
+                        phuong: phuong,
+                        price: price
+                    },
+                    success: function(response) {
+                        if(response.success){
+                            Swal.fire("Thêm phí vận chuyển thành công");
+                           
+                        }else if(response.duplicate){
+                            Swal.fire("Dữ liệu trùng lặp");
+                        }
+                    },
+                    error: function() {
+                        Swal.fire("Đã xảy ra lỗi khi thêm phí vận chuyển");
+                    }
+                });
+            }
+        })
+        $(document).ready(function() {
+            //Lấy tỉnh thành
+            $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm',function(data_tinh){
+                if(data_tinh.error==0){
+                   $.each(data_tinh.data, function (key_tinh,val_tinh) {
+                      $("#tinh").append('<option value="'+val_tinh.id+'">'+val_tinh.full_name+'</option>');
+                   });
+                   $("#tinh").change(function(e){
+                        var idtinh=$(this).val();
+                        //Lấy quận huyện
+                        $.getJSON('https://esgoo.net/api-tinhthanh/2/'+idtinh+'.htm',function(data_quan){
+                            if(data_quan.error==0){
+                               $("#quan").html('<option value="0">Quận Huyện</option>');
+                               $("#phuong").html('<option value="0">Phường Xã</option>');
+                               $.each(data_quan.data, function (key_quan,val_quan) {
+                                  $("#quan").append('<option value="'+val_quan.id+'">'+val_quan.full_name+'</option>');
+                               });
+                               //Lấy phường xã
+                               $("#quan").change(function(e){
+                                    var idquan=$(this).val();
+                                    $.getJSON('https://esgoo.net/api-tinhthanh/3/'+idquan+'.htm',function(data_phuong){
+                                        if(data_phuong.error==0){
+                                           $("#phuong").html('<option value="0">Phường Xã</option>');
+                                           $.each(data_phuong.data, function (key_phuong,val_phuong) {
+                                              $("#phuong").append('<option value="'+val_phuong.id+'">'+val_phuong.full_name+'</option>');
+                                           });
+                                        }
+                                    });
+                               });
+
+                            }
+                        });
+                   });
+
+                }
+            });
+         });
+    </script>
+}
+<style type="text/css">
+    .css_select_div {
+        text-align: center;
+    }
+
+    .css_select {
+        display: inline-table;
+        width: 25%;
+        padding: 5px;
+        margin: 5px 2%;
+        border: solid 1px #686868;
+        border-radius: 5px;
+    }
+    /* ===== CARD ===== */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    /* ===== INPUT ===== */
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #dcdfe6;
+    }
+
+        .custom-input:focus {
+            border-color: #0b1f3a;
+            box-shadow: 0 0 0 2px rgba(11,31,58,0.1);
+        }
+
+    /* ===== BUTTON ===== */
+    .btn-navy {
+        background: #0b1f3a;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+    }
+
+        .btn-navy:hover {
+            background: #132c52;
+        }
+
+    /* ===== TABLE ===== */
+    .custom-table thead {
+        background: #f5f7fb;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #f9fafc;
+    }
+
+    /* ===== BACK LINK ===== */
+    .back-link {
+        color: #0b1f3a;
+        text-decoration: none;
+    }
+</style>

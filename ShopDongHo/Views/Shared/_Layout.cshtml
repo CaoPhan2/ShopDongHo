@@ -1,0 +1,923 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<title>Home | E-Shopper</title>
+	<link href="~/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+		<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.2/themes/base/jquery-ui.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="~/css/prettyPhoto.css" rel="stylesheet">
+	<link href="~/css/price-range.css" rel="stylesheet">
+	<link href="~/css/animate.css" rel="stylesheet">
+	<link href="~/css/main.css" rel="stylesheet">
+	<link href="~/css/responsive.css" rel="stylesheet">
+	<link href="~/css/lg.css" rel="stylesheet">
+	<link href="~/css/product.css" rel="stylesheet">
+	<!--[if lt IE 9]>
+	<script src="~/js/html5shiv.js"></script>
+	<script src="~/js/respond.min.js"></script>
+	<![endif]-->
+	<link rel="shortcut icon" href="images/ico/favicon.ico">
+	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
+	<link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
+</head><!--/head-->
+
+<body>
+	<header id="header">
+		<div class="top-bar">
+			<div class="container flex-between">
+				<span>Miễn phí vận chuyển đơn từ 500.000đ</span>
+				<span>Đổi trả dễ dàng trong 7 ngày</span>
+				<span>Bảo hành chính hãng 12 tháng</span>
+				<span>Hotline: 0123 456 789</span>
+			</div>
+		</div>
+
+		<div class="main-header">
+			<!-- LOGO -->
+			<div class="logo">
+				<a asp-controller="Home" asp-action="Index">
+					<img src="~/images/lg-removebg.png" alt="logo" />
+				</a>
+			</div>
+
+			<!-- MENU -->
+			<nav class="nav-menu">
+				<a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+				<a asp-controller="Home" asp-action="Wishlist">Yêu Thích</a>
+				<a asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a>
+				<a asp-controller="Home" asp-action="Contact">Liên hệ</a>
+			</nav>
+
+			<!-- RIGHT -->
+			<div class="header-right">
+				<form asp-controller="Product" asp-action="Search" method="post" class="search-box">
+					<input type="text" name="keyWord" placeholder="Tìm kiếm..." />
+					<button type="submit"><i class="fa fa-search"></i></button>
+				</form>
+
+				<a asp-controller="Cart" asp-action="Index"> <i class="fa fa-shopping-cart" style="font-size: 24px"></i></a>
+				@if (User.Identity?.IsAuthenticated ?? false)
+				{
+					<div class="dropdown">
+
+						<span>
+							Xin chào, @User.Identity.Name ▾
+						</span>
+
+						<div class="dropdown-menu">
+
+							<a asp-action="History"
+							   asp-controller="Account">
+								Lịch sử mua hàng
+							</a>
+
+							<a asp-action="UpdateAccount"
+							   asp-controller="Account">
+								Cập nhật thông tin
+							</a>
+
+							<a asp-controller="Account"
+							   asp-action="Logout"
+							   onclick="return confirm('Bạn có muốn đăng xuất không?')">
+
+								Đăng Xuất
+
+							</a>
+
+						</div>
+
+					</div>
+				}
+				else
+				{
+					<a asp-controller="Account"
+					   asp-action="Login">
+
+						Đăng Nhập
+
+					</a>
+				}
+			</div>
+		</div>
+	</header>
+
+	<section class="lux-slider">
+		<div class="slides">
+
+			<!-- Slide 1 -->
+			<div class="slide active">
+				<div class="overlay"></div>
+
+				<div class="content">
+					<h1>TIME IS LUXURY</h1>
+					<p>Đồng hồ cao cấp - Khẳng định đẳng cấp</p>
+					<a href="#" class="btn">Khám phá ngay</a>
+				</div>
+
+				<img src="https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3" />
+			</div>
+
+			<!-- Slide 2 -->
+			<div class="slide">
+				<div class="overlay"></div>
+
+				<div class="content">
+					<h1>NEW COLLECTION</h1>
+					<p>Thiết kế tinh tế - Công nghệ hiện đại</p>
+					<a href="#" class="btn">Xem bộ sưu tập</a>
+				</div>
+
+				<img src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d" />
+			</div>
+
+		</div>
+
+		<!-- controls -->
+		<div class="controls">
+			<span class="prev">&#10094;</span>
+			<span class="next">&#10095;</span>
+		</div>
+
+		<!-- dots -->
+		<div class="dots"></div>
+	</section>
+	<div class="policy-wrapper">
+
+		<!-- ITEM 1 -->
+		<div class="policy-item">
+			<div class="policy-icon">
+				<i class="fa-solid fa-shield-halved"></i>
+			</div>
+
+			<div class="policy-content">
+				<h4>Sản phẩm chính hãng</h4>
+				<p>Cam kết 100% chính hãng</p>
+			</div>
+		</div>
+
+		<!-- ITEM 2 -->
+		<div class="policy-item">
+			<div class="policy-icon">
+				<i class="fa-solid fa-truck"></i>
+			</div>
+
+			<div class="policy-content">
+				<h4>Miễn phí vận chuyển</h4>
+				<p>Đơn từ 500.000đ</p>
+			</div>
+		</div>
+
+		<!-- ITEM 3 -->
+		<div class="policy-item">
+			<div class="policy-icon">
+				<i class="fa-solid fa-rotate"></i>
+			</div>
+
+			<div class="policy-content">
+				<h4>Đổi trả dễ dàng</h4>
+				<p>Trong vòng 7 ngày</p>
+			</div>
+		</div>
+
+		<!-- ITEM 4 -->
+		<div class="policy-item">
+			<div class="policy-icon">
+				<i class="fa-solid fa-shield-heart"></i>
+			</div>
+
+			<div class="policy-content">
+				<h4>Bảo hành uy tín</h4>
+				<p>Bảo hành chính hãng 12 tháng</p>
+			</div>
+		</div>
+
+		<!-- ITEM 5 -->
+		<div class="policy-item">
+			<div class="policy-icon">
+				<i class="fa-solid fa-headset"></i>
+			</div>
+
+			<div class="policy-content">
+				<h4>Hỗ trợ 24/7</h4>
+				<p>Hotline: 0123 456 789</p>
+			</div>
+		</div>
+
+	</div>
+	<section>
+		<div class="container">
+			<div class="row">
+                @Html.Partial("_NotificationPartial")
+                @RenderBody()
+			</div>
+		</div>
+	</section>
+	<!-- CHAT BUBBLE -->
+
+	<div id="chat-bubble">
+		<div class="bubble-icon">💬</div>
+		<div class="bubble-text">AI Chat</div>
+	</div>
+
+	<!-- CHAT BOX -->
+	<div id="chat-box">
+
+		<div class="chat-header">
+			AI Trợ lý ảo C&P
+		</div>
+
+		<div class="chat-body" id="chat-body">
+			<span class="text">Xin chào, Mình là trợ lý ảo cửa hàng C&P store, mình có thể giúp gì cho bạn nhỉ 🤗?</span>
+		</div>
+
+		<div class="chat-footer">
+
+			<input type="text"
+				   id="user-input"
+				   placeholder="Nhập tin nhắn..." />
+
+			<button onclick="sendMessage()">
+				Gửi
+			</button>
+
+		</div>
+
+	</div>
+	<footer id="footer">
+		<!--Footer-->
+        <partial name="_FooterPartial"/>
+		
+	</footer><!--/Footer-->
+
+
+
+
+	<script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v25.0&appId=APP_ID"></script>
+	<script src="~/js/jquery.js"></script>
+	<script src="~/js/bootstrap.min.js"></script>
+	<script src="~/js/jquery.scrollUp.min.js"></script>
+	<script src="~/js/price-range.js"></script>
+	<script src="~/js/jquery.prettyPhoto.js"></script>
+	<script src="~/js/main.js"></script>
+	<script src="~/js/product.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.all.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script>
+		let slides = document.querySelectorAll(".lux-slider .slide");
+		let next = document.querySelector(".next");
+		let prev = document.querySelector(".prev");
+		let dotsContainer = document.querySelector(".dots");
+
+		let index = 0;
+
+		/* tạo dots */
+		slides.forEach((_, i) => {
+			let dot = document.createElement("span");
+			if(i === 0) dot.classList.add("active");
+			dot.addEventListener("click", () => showSlide(i));
+			dotsContainer.appendChild(dot);
+		});
+
+		let dots = document.querySelectorAll(".dots span");
+
+		function showSlide(i) {
+			slides[index].classList.remove("active");
+			dots[index].classList.remove("active");
+
+			index = i;
+
+			slides[index].classList.add("active");
+			dots[index].classList.add("active");
+		}
+
+		next.onclick = () => {
+			let i = (index + 1) % slides.length;
+			showSlide(i);
+		};
+
+		prev.onclick = () => {
+			let i = (index - 1 + slides.length) % slides.length;
+			showSlide(i);
+		};
+
+		/* auto chạy */
+		setInterval(() => {
+			next.click();
+		}, 6000);
+
+
+	</script>
+
+	<script>
+
+		const bubble =
+			document.getElementById("chat-bubble");
+
+		const chatBox =
+			document.getElementById("chat-box");
+
+		const chatBody =
+			document.getElementById("chat-body");
+
+		bubble.onclick = () => {
+
+			if(chatBox.style.display === "flex"){
+				chatBox.style.display = "none";
+			}
+			else{
+				chatBox.style.display = "flex";
+			}
+		}
+
+		async function sendMessage(){
+
+			let input =
+				document.getElementById("user-input");
+
+			let message = input.value;
+
+			if(message.trim() === "") return;
+
+			// USER MESSAGE
+
+			chatBody.innerHTML += `
+				<div class="user-message">
+					${message}
+				</div>
+			`;
+
+			input.value = "";
+
+			// LOADING
+
+			chatBody.innerHTML += `
+				<div class="bot-message" id="loading-message">
+					Đang trả lời...
+				</div>
+			`;
+
+			chatBody.scrollTop =
+				chatBody.scrollHeight;
+
+			try{
+
+				const response = await fetch('/Chat/Ask',{
+
+					method:'POST',
+
+					headers:{
+						'Content-Type':'application/json'
+					},
+
+					body:JSON.stringify({
+						message:message
+					})
+				});
+
+				const data = await response.json();
+
+				// REMOVE LOADING
+
+				document
+					.getElementById("loading-message")
+					.remove();
+
+				// BOT MESSAGE
+
+				chatBody.innerHTML += `
+					<div class="bot-message">
+						${data.reply}
+					</div>
+				`;
+
+				chatBody.scrollTop =
+					chatBody.scrollHeight;
+			}
+			catch(err){
+
+				console.log(err);
+
+				alert("Có lỗi xảy ra");
+			}
+		}
+
+	</script>
+
+	<script>
+
+		const currentPath = window.location.pathname.toLowerCase();
+
+		document.querySelectorAll('.nav-menu a').forEach(link => {
+
+			const linkPath = new URL(link.href).pathname.toLowerCase();
+
+			if (currentPath === linkPath) {
+				link.classList.add('active');
+			}
+			else {
+				link.classList.remove('active');
+			}
+
+		});
+
+	</script>
+	@await RenderSectionAsync("Scripts", required: false)
+
+</body>
+<style>
+	/* RESET */
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	/* TOP BAR */
+	.top-bar {
+		background: #0b2c5f;
+		color: #fff;
+		font-size: 14px;
+		padding: 8px 0;
+	}
+
+	.flex-between {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	/* MAIN HEADER */
+	.main-header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		padding: 15px 45px;
+	}
+
+	/* LOGO */
+	.logo img {
+		width: 150px;
+		height: auto;
+		margin: -30px 0;
+	}
+
+	/* MENU */
+	.nav-menu {
+		display: flex;
+		gap: 25px;
+	}
+
+		.nav-menu a {
+			text-decoration: none;
+			color: #0b2c5f;
+			font-weight: 500;
+			text-transform: uppercase;
+		}
+
+
+
+			.nav-menu a.active {
+				border-bottom: 2px solid #0b2c5f;
+			}
+
+
+	/* DROPDOWN */
+	.dropdown {
+		position: relative;
+		cursor: pointer;
+	}
+
+		.dropdown span {
+			text-transform: uppercase;
+			color: #0b2c5f;
+			font-weight: 500;
+		}
+
+	.dropdown-menu {
+		position: absolute;
+		top: 18px;
+		left: 0;
+		background: #fff;
+		display: none;
+		flex-direction: column;
+		box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	}
+
+		.dropdown-menu a {
+			text-transform: uppercase;
+			color: #0b2c5f;
+			font-weight: 500;
+			padding: 8px 15px;
+			white-space: nowrap;
+			display: block;
+		}
+
+	.dropdown:hover .dropdown-menu {
+		display: block;
+	}
+
+
+
+	/* SEARCH */
+	.search-box {
+		display: flex;
+		border: 1px solid #ddd;
+		border-radius: 5px;
+		overflow: hidden;
+	}
+
+		.search-box input {
+			border: none;
+			padding: 5px 10px;
+		}
+
+		.search-box button {
+			background: #0b2c5f;
+			color: #fff;
+			border: none;
+			padding: 5px 10px;
+		}
+
+	/* RIGHT */
+	.header-right {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+	}
+
+		.header-right a {
+			text-transform: uppercase;
+			color: #0b2c5f;
+			font-weight: 500;
+		}
+
+	/* SLIDER */
+
+	.lux-slider {
+		position: relative;
+		height: 350px;
+		overflow: hidden;
+		background: #0b1d3a;
+	}
+
+		/* slide */
+		.lux-slider .slide {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			transition: 0.8s ease;
+		}
+
+			.lux-slider .slide.active {
+				opacity: 1;
+				z-index: 2;
+			}
+
+			/* ảnh */
+			.lux-slider .slide img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transform: scale(1.1);
+				transition: 5s ease;
+			}
+
+			.lux-slider .slide.active img {
+				transform: scale(1);
+			}
+
+	/* overlay tối */
+	.overlay {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient( to right, rgba(11,29,58,0.9) 30%, rgba(11,29,58,0.3) 70% );
+		z-index: 1;
+	}
+
+	/* content */
+	.content {
+		position: absolute;
+		top: 50%;
+		left: 80px;
+		transform: translateY(-50%);
+		color: white;
+		z-index: 2;
+		max-width: 500px;
+	}
+
+		.content h1 {
+			font-size: 52px;
+			letter-spacing: 2px;
+			margin-bottom: 15px;
+			transform: translateY(40px);
+			opacity: 0;
+			transition: 0.6s;
+		}
+
+		.content p {
+			font-size: 18px;
+			margin-bottom: 25px;
+			color: #cbd5e1;
+			transform: translateY(40px);
+			opacity: 0;
+			transition: 0.8s;
+		}
+
+	.btn {
+		padding: 12px 28px;
+		background: white;
+		color: #0b1d3a;
+		border-radius: 30px;
+		text-decoration: none;
+		font-weight: bold;
+		transition: 1s;
+	}
+
+	/* khi active -> animate vào */
+	.lux-slider .slide.active .content h1,
+	.lux-slider .slide.active .content p,
+	.lux-slider .slide.active .btn {
+		transform: translateY(0);
+		opacity: 1;
+	}
+
+	/* controls */
+	.controls span {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 30px;
+		color: white;
+		cursor: pointer;
+		padding: 10px;
+		z-index: 3;
+	}
+
+	.prev {
+		left: 20px;
+	}
+
+	.next {
+		right: 20px;
+	}
+
+	/* dots */
+	.dots {
+		position: absolute;
+		bottom: 20px;
+		width: 100%;
+		text-align: center;
+		z-index: 3;
+	}
+
+		.dots span {
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			margin: 5px;
+			background: #ccc;
+			border-radius: 50%;
+			cursor: pointer;
+		}
+
+		.dots .active {
+			background: white;
+		}
+	/* BUTTON */
+	.btn-shop {
+		display: inline-block;
+		padding: 10px 20px;
+		border: 1px solid #fff;
+		color: #fff;
+		text-decoration: none;
+		transition: 0.3s;
+	}
+
+		.btn-shop:hover {
+			background: #fff;
+			color: #0b2c5f;
+		}
+
+	/* ARROWS */
+	.control-carousel i {
+		font-size: 30px;
+		color: #fff;
+	}
+
+	.control-carousel {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 3;
+	}
+
+	.left {
+		left: 20px;
+	}
+
+	.right {
+		right: 20px;
+	}
+	/* FEATURE ICONS */
+	.features {
+		display: flex;
+		justify-content: space-between;
+		margin: 20px 0;
+		text-align: center;
+	}
+
+		.features div {
+			flex: 1;
+		}
+
+	/* PRODUCT CARD */
+	.product-item {
+		border: 1px solid #eee;
+		padding: 10px;
+		border-radius: 10px;
+		transition: 0.3s;
+	}
+
+		.product-item:hover {
+			box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+		}
+
+		.product-item img {
+			width: 100%;
+		}
+
+		.product-item .price {
+			color: #0b2c5f;
+			font-weight: bold;
+		}
+
+	.policy-wrapper {
+		width: 100%;
+		background: #fff;
+		display: flex;
+		justify-content: space-evenly;
+		flex-wrap: wrap;
+		align-items: center;
+		padding: 18px 30px;
+	}
+
+	.policy-item {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		min-width: 180px;
+	}
+
+	.policy-icon {
+		width: 42px;
+		height: 42px;
+		border: 2px solid #d9d9d9;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #0b1d4d;
+		font-size: 18px;
+	}
+
+	.policy-content h4 {
+		font-size: 13px;
+		font-weight: 700;
+		color: #111;
+		text-transform: uppercase;
+		margin-bottom: 4px;
+	}
+
+	.policy-content p {
+		font-size: 12px;
+		color: #666;
+	}
+
+		.policy-content p span {
+			color: #999;
+		}
+
+
+	#chat-bubble {
+		position: fixed;
+		bottom: 70px;
+		right: 20px;
+		width: 65px;
+		height: 65px;
+		background: #FE980F;
+		color: white;
+		border-radius: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	}
+
+		#chat-bubble:hover {
+			transform: scale(1.08);
+		}
+
+	.bubble-icon {
+		font-size: 24px;
+		line-height: 1;
+	}
+
+	.bubble-text {
+		font-size: 12px;
+		font-weight: 600;
+		margin-top: 4px;
+	}
+	/* CHAT BOX */
+
+	#chat-box {
+		position: fixed;
+		bottom: 100px;
+		right: 20px;
+		width: 350px;
+		height: 500px;
+		background: white;
+		border-radius: 20px;
+		display: none;
+		flex-direction: column;
+		overflow: hidden;
+		z-index: 9999;
+		box-shadow: 0 0 20px rgba(0,0,0,.2);
+	}
+
+	/* HEADER */
+
+	.chat-header {
+		background: #FE980F;
+		color: white;
+		padding: 15px;
+		font-weight: bold;
+	}
+
+	/* BODY */
+
+	.chat-body {
+		flex: 1;
+		padding: 15px;
+		overflow-y: auto;
+		background: #f8fafc;
+	}
+
+	/* FOOTER */
+
+	.chat-footer {
+		display: flex;
+		padding: 10px;
+		gap: 10px;
+		border-top: 1px solid #ddd;
+	}
+
+		.chat-footer input {
+			flex: 1;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 10px;
+		}
+
+		.chat-footer button {
+			background: #FE980F;
+			color: white;
+			border: none;
+			padding: 10px 15px;
+			border-radius: 10px;
+		}
+
+	/* MESSAGES */
+
+	.user-message {
+		background: #dbeafe;
+		padding: 10px;
+		border-radius: 10px;
+		margin-bottom: 10px;
+	}
+
+	.bot-message {
+		background: #e2e8f0;
+		padding: 10px;
+		white-space: pre-line;
+		border-radius: 10px;
+		margin-bottom: 10px;
+	}
+	
+</style>
+
+</html>

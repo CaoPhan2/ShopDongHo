@@ -1,0 +1,229 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<BrandModel>
+
+@{
+    ViewData["Title"] = "Thương hiệu";
+    Paginate pager = new Paginate();
+    int pageNo = 0;
+
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+
+<div class="brand-container">
+
+    <!-- HEADER -->
+    <div class="brand-header">
+        <h1>Quản lý thương hiệu</h1>
+        <a class="btn-main" asp-controller="Brand" asp-action="Create">
+            + Thêm thương hiệu
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="brand-card">
+        <table class="table brand-table" id="myTable">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên</th>
+                    <th>Mô tả</th>
+                    <th>Slug</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+
+                        <td class="b-name">
+                            @item.Name
+                        </td>
+
+                        <td class="b-desc">
+                            @Html.Raw(item.Description)
+                        </td>
+
+                        <td>
+                            <span class="b-slug">@item.Slug</span>
+                        </td>
+
+                        <td>
+                            @if (item.Status == 1)
+                            {
+                                <span class="badge badge-active">Hiển thị</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-hidden">Ẩn</span>
+                            }
+                        </td>
+
+                        <td>
+                            <div class="b-action">
+                                <a class="btn-edit"
+                                   asp-controller="Brand"
+                                   asp-action="Edit"
+                                   asp-route-Id="@item.Id">
+                                    Sửa
+                                </a>
+
+                                <a class="btn-delete confirmDeletion"
+                                   asp-controller="Brand"
+                                   asp-action="Delete"
+                                   asp-route-Id="@item.Id">
+                                    Xóa
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+        <!-- PAGINATION -->
+        <div class="brand-pagination">
+            <partial name="_paging" model="@pager" />
+        </div>
+
+    </div>
+
+</div>
+<style>
+    /* CONTAINER */
+    .brand-container {
+        padding: 25px;
+        background: #f7f9fc;
+    }
+
+    /* HEADER */
+    .brand-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .brand-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0b1f3a;
+        }
+
+    /* BUTTON */
+    .btn-main {
+        background: #0b1f3a;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-decoration: none;
+    }
+
+        .btn-main:hover {
+            background: #142f55;
+        }
+
+    /* CARD */
+    .brand-card {
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .brand-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+    .brand-table th {
+        border: none;
+        padding: 12px;
+    }
+
+    .brand-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* NAME */
+    .b-name {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* DESC */
+    .b-desc {
+        max-width: 250px;
+        font-size: 13px;
+        color: #777;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    /* SLUG */
+    .b-slug {
+        font-size: 12px;
+        color: #888;
+    }
+
+    /* BADGE */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .badge-active {
+        background: #e6f7ee;
+        color: #28a745;
+    }
+
+    .badge-hidden {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+    /* ACTION */
+    .b-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-edit {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #ffc107;
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+    /* PAGINATION */
+    .brand-pagination {
+        margin-top: 15px;
+        text-align: center;
+    }
+</style>

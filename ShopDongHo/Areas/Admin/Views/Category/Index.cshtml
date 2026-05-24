@@ -1,0 +1,218 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<CategoryModel>
+
+@{
+    ViewData["Title"] = "Danh mục";
+}
+
+<div class="category-container">
+
+    <!-- HEADER -->
+    <div class="category-header">
+        <h1>Quản lý danh mục</h1>
+        <a class="btn-main" asp-controller="Category" asp-action="Create">
+            + Thêm danh mục
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="category-card">
+        <table class="table category-table" id="myTable">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên danh mục</th>
+                    <th>Mô tả</th>
+                    <th>Slug</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.Id</td>
+
+                        <td class="c-name">
+                            @item.Name
+                        </td>
+
+                        <td class="c-desc">
+                            @Html.Raw(item.Description)
+                        </td>
+
+                        <td>
+                            <span class="c-slug">
+                                @item.Slug
+                            </span>
+                        </td>
+
+                        <td>
+                            @if (item.Status == 1)
+                            {
+                                <span class="badge badge-active">
+                                    Hiển thị
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-hidden">
+                                    Ẩn
+                                </span>
+                            }
+                        </td>
+
+                        <td>
+                            <div class="c-action">
+                                <a class="btn-edit"
+                                   asp-controller="Category"
+                                   asp-action="Edit"
+                                   asp-route-Id="@item.Id">
+                                    Sửa
+                                </a>
+
+                                <a class="btn-delete confirmDeletion"
+                                   asp-controller="Category"
+                                   asp-action="Delete"
+                                   asp-route-Id="@item.Id">
+                                    Xóa
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+<style>
+    /* CONTAINER */
+    .category-container {
+        padding: 25px;
+        background: #f7f9fc;
+    }
+
+    /* HEADER */
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .category-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0b1f3a;
+        }
+
+    /* BUTTON */
+    .btn-main {
+        background: #0b1f3a;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-decoration: none;
+    }
+
+        .btn-main:hover {
+            background: #142f55;
+        }
+
+    /* CARD */
+    .category-card {
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .category-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+    .category-table th {
+        border: none;
+        padding: 12px;
+    }
+
+    .category-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* NAME */
+    .c-name {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* DESC */
+    .c-desc {
+        max-width: 250px;
+        font-size: 13px;
+        color: #777;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    /* SLUG */
+    .c-slug {
+        font-size: 12px;
+        color: #888;
+    }
+
+    /* BADGE */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .badge-active {
+        background: #e6f7ee;
+        color: #28a745;
+    }
+
+    .badge-hidden {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+    /* ACTION */
+    .c-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-edit {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #ffc107;
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+</style>

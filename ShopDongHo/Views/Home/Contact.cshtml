@@ -1,0 +1,232 @@
+﻿@using ShopDongHo.Models
+@model ContactModel
+
+    
+    
+<html>
+<body>
+    <div class="hero">
+        <h1>Liên hệ với chúng tôi</h1>
+        <p>
+            Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Nếu bạn có bất kỳ câu hỏi nào về sản phẩm,
+            đơn hàng hoặc hợp tác kinh doanh, hãy gửi tin nhắn ngay cho chúng tôi.
+        </p>
+    </div>
+
+    <div class="container_contact">
+
+        <!-- FORM -->
+        <div class="card">
+            <h2>Gửi tin nhắn</h2>
+            <form>
+                <input type="text" placeholder="Họ và tên">
+                <input type="email" placeholder="Email của bạn">
+                <input type="text" placeholder="Chủ đề">
+                <textarea rows="5" placeholder="Nội dung tin nhắn..."></textarea>
+                <button type="submit">Gửi liên hệ</button>
+            </form>
+        </div>
+
+        <!-- INFO -->
+        <div class="card info">
+            <h2>Thông tin liên hệ</h2>
+            <p>
+                Bạn có thể liên hệ với chúng tôi qua các kênh bên dưới. Đội ngũ hỗ trợ sẽ phản hồi
+                trong thời gian sớm nhất có thể.
+            </p>
+
+            <div class="box">
+                📍 Địa chỉ: Trần Phú, Thành phố Huế
+            </div>
+            <div class="box">
+                📞 Hotline: 0705236974
+            </div>
+            <div class="box">
+                📧 Email: 22T1080005@husc.edu.vn
+            </div>
+            <div class="box">
+                ⏰ Thời gian: 8:00 - 22:00 mỗi ngày
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq">
+            <h2 style="margin-bottom:15px;">Câu hỏi thường gặp</h2>
+
+            <div class="faq-item" onclick="toggle(this)">
+                <b>Làm sao để đặt hàng?</b>
+                <div class="answer">Bạn chỉ cần chọn sản phẩm và thêm vào giỏ hàng, sau đó thanh toán.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggle(this)">
+                <b>Thời gian giao hàng bao lâu?</b>
+                <div class="answer">Thông thường từ 2-5 ngày tùy khu vực.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggle(this)">
+                <b>Có hỗ trợ đổi trả không?</b>
+                <div class="answer">Có, hỗ trợ đổi trả trong vòng 7 ngày nếu lỗi từ sản phẩm.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggle(this)">
+                <b>Tôi có thể hợp tác bán hàng không?</b>
+                <div class="answer">Có, hãy gửi email hoặc form để được tư vấn chi tiết.</div>
+            </div>
+        </div>
+
+    </div>
+    <div class="map-wrapper">
+        <div class="col-sm-12 col-md-6 map-box">
+            @Html.Raw(Model.Map)
+        </div>
+    </div>
+
+</body>
+</html>
+<script>
+    function toggle(el){
+        let ans = el.querySelector(".answer");
+        ans.style.display = (ans.style.display === "block") ? "none" : "block";
+    }
+</script>
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #f5f7fb;
+        color: #1f2937;
+    }
+
+    /* HEADER */
+    .hero {
+        background: linear-gradient(135deg,#ffffff,#eaf2ff);
+        padding: 60px 20px;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #475569;
+            max-width: 700px;
+            margin: auto;
+            line-height: 1.6;
+        }
+
+    /* CONTAINER */
+    .container_contact {
+        max-width: 1100px;
+        margin: auto;
+        padding: 40px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    /* FORM */
+    .card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+        .card h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+    .card input, textarea {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        outline: none;
+    }
+
+    .card button {
+        background: #2563eb;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .card button:hover {
+            background: #1d4ed8;
+        }
+
+    /* INFO */
+    .info p {
+        line-height: 1.7;
+        color: #475569;
+    }
+
+    .box {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 12px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+    }
+
+    /* FAQ */
+    .faq {
+        grid-column: 1 / -1;
+        margin-top: 10px;
+    }
+
+    .faq-item {
+        background: white;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+
+    .answer {
+        display: none;
+        margin-top: 10px;
+        color: #64748b;
+    }
+
+
+    .map-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px 15px;
+    }
+
+    .map-box {
+        width: 100%;
+        max-width: 1050px; 
+        height: 300px; 
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+        /* nếu iframe bên trong map bị nhỏ */
+        .map-box iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+ }
+</style>
+
+</div>

@@ -1,0 +1,264 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<ProductModel>
+
+@{
+	ViewData["Title"] = "Danh sách sản phẩm";
+
+	Paginate pager = new Paginate();
+	int pageNo = 0;
+	if(ViewBag.Pager != null)
+	{
+		pager = ViewBag.Pager;
+		pageNo = pager.CurrentPage;
+	}
+}
+<div class="col-sm-3">
+	@Html.Partial("_SidebarPartial")
+</div>
+
+<div class="col-sm-9 padding-right">
+	<div class="features_items">
+		<!--features_items-->
+		<h2 class="title text-center">Sản Phẩm Nổi Bật</h2>
+		@foreach(var item in Model)
+		{
+			<div class="col-lg-3 col-md-4 col-sm-6">
+				<partial name="_ProductItemCard" model="item" />
+			</div>
+		}
+		
+
+	</div><!--features_items-->
+
+	<section class="featured-category-section">
+		<div class="container-featcat">
+
+			<!-- TITLE -->
+			<div class="section-header">
+				<div class="mini-icon">
+					<i class="fa-solid fa-crown"></i>
+				</div>
+
+				<h2>DANH MỤC HOT</h2>
+
+				<div class="line"></div>
+
+				<p>Khám phá các danh mục đồng hồ được yêu thích nhất</p>
+			</div>
+
+			<!-- LIST -->
+			<div class="featured-category-grid">
+
+				@{
+					int key = 1;
+				}
+
+				@foreach (var item in ViewBag.FeaturedCategories)
+				{
+					<div class="category-card">
+
+						<div class="category-image">
+							<img src="~/images/catImage_@(key).jpg" alt="@item.Category.Name">
+						</div>
+
+						<div class="category-content">
+
+							<div class="category-name">
+								<i class="fa-regular fa-clock"></i>
+								<h3>@item.Category.Name</h3>
+							</div>
+
+							<span class="product-count">
+                                @item.ProductCount sản phẩm
+							</span>
+
+							<a asp-controller="Category"
+							   asp-action="Index"
+							   asp-route-slug="@item.Category.Slug"
+							   class="view-btn">
+								XEM NGAY
+								<i class="fa-solid fa-arrow-right"></i>
+							</a>
+
+						</div>
+					</div>
+
+					key++;
+				}
+
+			</div>
+
+		</div>
+	</section>
+	<section class="customer-feedback">
+
+		<div class="container">
+
+			<div class="section-title">
+				<h2>FEEDBACK KHÁCH HÀNG</h2>
+				<div class="title-line"></div>
+				<p>
+					Những chia sẻ chân thực từ khách hàng đã trải nghiệm sản phẩm
+				</p>
+			</div>
+
+			<div class="swiper feedbackSwiper">
+
+				<div class="swiper-wrapper">
+
+					<!-- CARD 1 -->
+					@foreach(var item in ViewBag.Reviews)
+					{
+						<div class="swiper-slide">
+							<div class="feedback-card">
+
+								<div class="quote-icon">❝</div>
+
+								<div class="stars">
+
+									@for (int i = 1; i <= item.Star; i++)
+									{
+										<i class="fa-solid fa-star"></i>
+									}
+
+									@for (int i = item.Star + 1; i <= 5; i++)
+									{
+										<i class="fa-regular fa-star"></i>
+									}
+
+								</div>
+
+								<p class="feedback-text">
+                                    @item.Comment
+								</p>
+
+								<div class="customer-info">
+									<img src="https://i.pravatar.cc/100?img=12">
+
+									<div>
+										<h4>@item.Name</h4>
+										<span>@item.Email</span>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					}
+
+					
+
+				</div>
+
+				<!-- DOTS -->
+				<div class="swiper-pagination"></div>
+
+			</div>
+
+		</div>
+
+	</section>
+	<partial name="_paging" model="@pager"/>
+
+</div>
+
+
+@section Scripts{
+	
+	<script>
+		$(document).ready(function (){
+			$('.btn-add-cart').click(function(){
+                var Id = $(this).data('product_id');
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("AddToCart", "Cart")",
+                    data: {Id: Id}, // Dữ liệu được gửi đến server
+
+					success: function (result){
+						if(result){
+							Swal.fire({
+								toast: true,
+								position: 'top-end',
+								icon: 'success',
+								title: 'Đã thêm vào giỏ hàng',
+								showConfirmButton: false,
+								timer: 1500
+							});
+						}
+					},
+				});
+			});
+		});
+	</script>
+	<script>
+		$(document).ready(function (){
+			$('.add-wishlist-icon').click(function(){
+                var Id = $(this).data('product_id');
+
+				$.ajax({
+					type: "POST",
+					url: "@Url.Action("AddToWishlist", "Home")",
+                    data: {Id: Id}, // Dữ liệu được gửi đến server
+
+					success: function (result){
+						if(result){
+							Swal.fire({
+								toast: true,
+								position: 'top-end',
+								icon: 'success',
+								title: 'Đã thêm vào yêu thích',
+								showConfirmButton: false,
+								timer: 1500
+							});
+						}
+					},
+				});
+			});
+		});
+	</script>
+	
+	<script>
+		document.querySelectorAll('.add-wishlist-icon').forEach(btn => {
+				btn.addEventListener('click', function () {
+					this.classList.toggle('active');
+				});
+			});
+	</script>
+		
+
+	<script>
+				var swiper = new Swiper(".feedbackSwiper", {
+
+			slidesPerView: 3,
+			spaceBetween: 30,
+			loop: true,
+
+			autoplay: {
+				delay: 3500,
+				disableOnInteraction: false,
+			},
+
+			pagination: {
+				el: ".swiper-pagination",
+				clickable: true,
+			},
+
+			breakpoints: {
+
+				0: {
+					slidesPerView: 1
+				},
+
+				768: {
+					slidesPerView: 2
+				},
+
+				1200: {
+					slidesPerView: 3
+				}
+			}
+
+		});
+	</script>
+
+}

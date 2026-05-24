@@ -1,0 +1,41 @@
+﻿@model ProductModel
+<div class="product-card">
+
+
+	<div class="product-image">
+		<a asp-controller="Product" asp-action="Details" asp-route-Id="@Model.Id" class="product-link">
+			<img src="@Url.Content("~/media/products/" + Model.Images)"
+				 onerror="this.onerror=null; this.src='@Url.Content("~/images/no-image.jpg")';" />
+		</a>
+		@if (User.Identity?.IsAuthenticated ?? false)
+		{
+			<button class="add-wishlist-icon" data-product_id="@Model.Id">
+				<i class="fa fa-heart"></i>
+			</button>
+		}
+
+	</div>
+
+	<div class="product-content">
+		<p class="product-name">@Model.Name</p>
+		<p class="product-brand">Thương hiệu: @Model.Brand.Name</p>
+		<div class="pro_price_addCart">
+			<p class="product-price">@Model.Price.ToString("#,##0đ")</p>
+			<div class="product-actions">
+				@if (Model.Quantity > 0)
+				{
+					<button class="btn-add-cart" data-product_id="@Model.Id">
+						<i class="fa fa-shopping-cart btn_cart_icon"></i>
+					</button>
+				}
+				else
+				{
+					<button class="btn-out-stock">
+						Hết hàng
+					</button>
+				}
+			</div>
+		</div>
+
+	</div>
+</div>

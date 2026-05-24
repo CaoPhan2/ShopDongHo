@@ -1,0 +1,230 @@
+﻿@{
+    ViewData["Title"] = "Người dùng";
+}
+
+<div class="user-container">
+
+    <!-- HEADER -->
+    <div class="user-header">
+        <h1>Quản lý người dùng</h1>
+        <a class="btn-main" asp-controller="User" asp-action="Create">
+            + Thêm người dùng
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="user-card">
+        <table class="table user-table" id="myTable">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Người dùng</th>
+                    <th>Email</th>
+                    <th>SĐT</th>
+                    <th>Vai trò</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var usersWithRoles in Model)
+                {
+                    <tr>
+
+                        <td>@usersWithRoles.User.Id</td>
+
+                        <!-- USER INFO -->
+                        <td class="u-info">
+                            <div class="u-avatar">
+                                @usersWithRoles.User.UserName.Substring(0, 1).ToUpper()
+                            </div>
+
+                            <div>
+                                <div class="u-name">
+                                    @usersWithRoles.User.UserName
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>@usersWithRoles.User.Email</td>
+
+                        <td>
+                            @(string.IsNullOrEmpty(usersWithRoles.User.PhoneNumber)
+                                                    ? "-"
+                                                    : usersWithRoles.User.PhoneNumber)
+                    </td>
+
+                        <!-- ROLE -->
+                        <td>
+                        @if (usersWithRoles.RoleName == "Admin")
+                            {
+                                <span class="badge badge-admin">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-user">User</span>
+                            }
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                @if (usersWithRoles.User.Id != ViewBag.loggedInUserId)
+                                {
+                                    <div class="u-action">
+
+                                        <a class="btn-edit"
+                                           asp-controller="User"
+                                           asp-action="Edit"
+                                           asp-route-Id="@usersWithRoles.User.Id">
+                                            Sửa
+                                        </a>
+
+                                        <a class="btn-delete confirmDeletion"
+                                           asp-controller="User"
+                                           asp-action="Delete"
+                                           asp-route-Id="@usersWithRoles.User.Id">
+                                            Xóa
+                                        </a>
+
+                                    </div>
+                                }
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+<style>
+    /* CONTAINER */
+    .user-container {
+        padding: 25px;
+        background: #f7f9fc;
+    }
+
+    /* HEADER */
+    .user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .user-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #0b1f3a;
+        }
+
+    /* BUTTON */
+    .btn-main {
+        background: #0b1f3a;
+        color: #fff;
+        padding: 10px 15px;
+        border-radius: 10px;
+        text-decoration: none;
+    }
+
+        .btn-main:hover {
+            background: #142f55;
+        }
+
+    /* CARD */
+    .user-card {
+        margin-top: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .user-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+    .user-table th {
+        border: none;
+        padding: 12px;
+    }
+
+    .user-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* USER INFO */
+    .u-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .u-avatar {
+        width: 35px;
+        height: 35px;
+        background: #0b1f3a;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    /* NAME */
+    .u-name {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* BADGE */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .badge-admin {
+        background: #ffe0e0;
+        color: #dc3545;
+    }
+
+    .badge-user {
+        background: #e7f0ff;
+        color: #0d6efd;
+    }
+
+    /* ACTION */
+    .u-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-edit {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #ffc107;
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+</style>

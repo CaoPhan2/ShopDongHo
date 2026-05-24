@@ -1,0 +1,156 @@
+﻿@using ShopDongHo.Models
+@model ContactModel
+
+<footer class="footer-luxury">
+    <div class="row top-footer">
+
+        <!-- LOGO -->
+        <div class="col-md-3 col-sm-6">
+            <div class="footer-brand">
+                <img src="~/images/lg-removebg.png" class="logo-footer" />
+
+            </div>
+        </div>
+
+        <!-- SHOP -->
+        <div class="col-md-2 col-sm-6">
+            <h5>SHOP</h5>
+            <ul>
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="#">Best Sellers</a></li>
+                <li><a href="#">Men</a></li>
+                <li><a href="#">Women</a></li>
+            </ul>
+        </div>
+
+        <!-- SUPPORT -->
+        <div class="col-md-2 col-sm-6">
+            <h5>SUPPORT</h5>
+            <ul>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+            </ul>
+        </div>
+
+        <!-- INFO -->
+        <div class="col-md-2 col-sm-6">
+            <h5>ABOUT</h5>
+            <ul>
+                <li><a href="#">Our Story</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Blog</a></li>
+            </ul>
+        </div>
+
+        <!-- SUBSCRIBE -->
+        <div class="col-md-3 col-sm-6">
+            <h5>STAY CONNECTED</h5>
+            <p>Nhận ưu đãi mới nhất từ chúng tôi</p>
+
+            <div class="subscribe-box">
+                <input type="email" placeholder="Nhập email..." />
+                <button>→</button>
+            </div>
+
+            <div class="social">
+                <i class="fa fa-facebook"></i>
+                <i class="fa fa-instagram"></i>
+                <i class="fa fa-youtube"></i>
+                <i class="fa fa-tiktok"></i>
+            </div>
+        </div>
+
+    </div>
+</footer>
+<style>
+
+    .footer-luxury {
+        padding: 60px 0 20px;
+        font-family: 'Segoe UI', sans-serif;
+        border-top: 1px solid #eee;
+    }
+
+
+
+    .footer-brand h3 {
+        color: #0a1f44;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .slogan {
+        color: #c9a86a; /* gold */
+        font-size: 13px;
+    }
+
+    .footer-luxury h5 {
+        font-weight: 600;
+        color: #0a1f44;
+        margin-bottom: 15px;
+    }
+
+    .footer-luxury ul {
+        list-style: none;
+        padding: 0;
+    }
+
+        .footer-luxury ul li {
+            margin-bottom: 8px;
+        }
+
+            .footer-luxury ul li a {
+                text-decoration: none;
+                color: #555;
+                transition: 0.3s;
+            }
+
+                .footer-luxury ul li a:hover {
+                    color: #0a1f44;
+                    padding-left: 5px;
+                }
+
+    /* SUBSCRIBE */
+    .subscribe-box {
+        display: flex;
+        margin-top: 10px;
+    }
+
+        .subscribe-box input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .subscribe-box button {
+            background: #0a1f44;
+            color: #fff;
+            border: none;
+            padding: 0 15px;
+        }
+
+    /* SOCIAL */
+    .social {
+        margin-top: 15px;
+    }
+
+        .social i {
+            font-size: 16px;
+            margin-right: 10px;
+            color: #0a1f44;
+            cursor: pointer;
+        }
+
+    .logo-footer {
+        width: 150px;
+    }
+
+    .footer-brand img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+   
+</style>

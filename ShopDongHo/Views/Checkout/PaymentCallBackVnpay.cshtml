@@ -1,0 +1,135 @@
+﻿@using ShopDongHo.Models.VNPay
+@model PaymentResponseModel
+@{
+    ViewData["Title"] = "Payment CallBack Vnpay";
+}
+
+<div class="success-wrapper">
+
+    <div class="success-card">
+
+        <div class="success-icon">✔</div>
+
+        <h2>Thanh toán thành công</h2>
+        <p class="sub">Giao dịch của bạn đã được xử lý thành công</p>
+
+        <div class="order-info">
+            <div class="item">
+                <span>Mã đơn hàng</span>
+                <b>@Model.OrderId</b>
+            </div>
+
+            <div class="item">
+                <span>Thông tin đơn hàng</span>
+                <b>@Model.OrderDescription</b>
+            </div>
+
+            <div class="item">
+                <span>Phương thức</span>
+                <b>@Model.PaymentMethod</b>
+            </div>
+
+            <div class="item">
+                <span>Mã giao dịch</span>
+                <b>@Model.TransactionId</b>
+            </div>
+
+            <div class="item">
+                <span>Mã thanh toán</span>
+                <b>@Model.PaymentId</b>
+            </div>
+        </div>
+
+        <a asp-controller="Account" asp-action="History" class="btn">
+            Xem lịch sử giao dịch
+        </a>
+
+    </div>
+
+</div>
+<style>
+	.success-wrapper {
+		min-height: 80vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: #f4f6f9;
+	}
+
+	.success-card {
+		width: 460px;
+		background: #fff;
+		border-radius: 16px;
+		padding: 30px;
+		box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+		text-align: center;
+	}
+
+	.success-icon {
+		width: 70px;
+		height: 70px;
+		margin: 0 auto 15px;
+		border-radius: 50%;
+		background: #e8f5e9;
+		color: #2e7d32;
+		font-size: 30px;
+		line-height: 70px;
+		font-weight: bold;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 22px;
+	}
+
+	.sub {
+		color: #777;
+		font-size: 14px;
+		margin-bottom: 20px;
+	}
+
+	.order-info {
+		text-align: left;
+		background: #fafafa;
+		padding: 15px;
+		border-radius: 12px;
+	}
+
+	.item {
+		display: flex;
+		justify-content: space-between;
+		padding: 10px 0;
+		border-bottom: 1px dashed #ddd;
+		font-size: 14px;
+	}
+
+		.item:last-child {
+			border-bottom: none;
+		}
+
+		.item span {
+			color: #666;
+		}
+
+		.item b {
+			color: #222;
+		}
+
+	.btn {
+		display: block;
+		margin-top: 20px;
+		padding: 12px;
+		background: #0b1f3a;
+		color: #fff;
+		text-decoration: none;
+		border-radius: 10px;
+		font-weight: 600;
+		transition: 0.2s;
+	}
+
+		.btn:hover {
+			background: #062959;
+			color: #fff;
+		}
+
+</style>

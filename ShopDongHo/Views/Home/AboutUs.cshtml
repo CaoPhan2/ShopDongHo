@@ -1,0 +1,177 @@
+﻿@{
+    ViewData["Title"] = "Về Chúng Tôi";
+}
+<!-- HERO SECTION -->
+<section class="about-hero">
+    <div class="container_about">
+        <div class="about-hero-content">
+            <span class="sub-title">ABOUT US</span>
+            <h1>Về chúng tôi</h1>
+            <p>
+                C&P Store được xây dựng với sứ mệnh mang đến cho khách hàng những sản phẩm công nghệ
+                chất lượng cao, chính hãng và trải nghiệm mua sắm hiện đại – tiện lợi – nhanh chóng.
+            </p>
+        </div>
+
+        <div class="about-hero-image">
+            <img src="~/images/shopImage1.jpg" alt="C&P Store" width="300px"/>
+        </div>
+    </div>
+</section>
+
+<!-- STORY SECTION -->
+<section class="about-story">
+    <div class="container_about">
+        <div class="story-image">
+            <img src="~/images/shopImage2.jpg" alt="C&P Store" width="300px" />
+        </div>
+        <div class="story-content">
+            <span class="label">CÂU CHUYỆN CỦA CHÚNG TÔI</span>
+            <h2>Khởi nguồn từ đam mê công nghệ</h2>
+            <p>
+                C&P Store ra đời từ tình yêu với công nghệ và mong muốn mang đến những sản phẩm tốt nhất
+                cho người dùng Việt Nam. Chúng tôi không chỉ bán sản phẩm, mà còn mang đến trải nghiệm
+                sử dụng hiện đại, tiện ích và đáng tin cậy.
+            </p>
+
+            <ul class="story-list">
+                <li>✔ Sản phẩm chính hãng 100%</li>
+                <li>✔ Giá cả cạnh tranh nhất thị trường</li>
+                <li>✔ Hỗ trợ khách hàng 24/7</li>
+            </ul>
+        </div>
+
+        
+    </div>
+</section>
+
+<!-- VALUES SECTION -->
+<section class="about-values">
+    <div class="container_about">
+        <h2>Giá trị chúng tôi theo đuổi</h2>
+
+        <div class="values-grid">
+            <div class="value-card">
+                <i class="fa-solid fa-award"></i>
+                <h3>Chất lượng</h3>
+                <p>Cam kết mang đến sản phẩm chính hãng, chất lượng cao nhất.</p>
+            </div>
+
+            <div class="value-card">
+                <i class="fa-solid fa-medal"></i>
+                <h3>Uy tín</h3>
+                <p>Xây dựng niềm tin trong từng đơn hàng và dịch vụ.</p>
+            </div>
+
+            <div class="value-card">
+                <i class="fa-solid fa-heart"></i>
+                <h3>Tận tâm</h3>
+                <p>Luôn lắng nghe và hỗ trợ khách hàng nhanh chóng.</p>
+            </div>
+
+            <div class="value-card">
+                <i class="fa-solid fa-rocket"></i>
+                <h3>Đổi mới</h3>
+                <p>Cập nhật xu hướng công nghệ liên tục mỗi ngày.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- STATISTICS SECTION -->
+
+
+<!-- TEAM SECTION -->
+<section class="about-team">
+    <div class="container_about">
+        <div class="team-content">
+            <h2>Những con người đứng sau C&P Store</h2>
+            <p>
+                Chúng tôi là một đội ngũ trẻ trung, sáng tạo và đầy nhiệt huyết.
+                Mỗi thành viên đều góp phần tạo nên một C&P Store chuyên nghiệp và thân thiện.
+            </p>
+            <div class="stats-grid">
+                <div class="stat">
+                    <h3>50+</h3>
+                    <p>Thành viên</p>
+                </div>
+
+                <div class="stat">
+                    <h3>10K+</h3>
+                    <p>Khách hàng hài lòng</p>
+                </div>
+
+                <div class="stat">
+                    <h3>5+</h3>
+                    <p>Năm kinh nghiệm</p>
+                </div>
+
+                <div class="stat">
+                    <h3>1000+</h3>
+                    <p>Sản phẩm đã bán</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-image">
+            <div class="story-image">
+                <img src="~/images/shopImage3.jpg" alt="C&P Store" width="300px" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .about-hero, .about-story, .about-values, .about-stats, .about-team {
+        padding: 10px 0;
+        background: #fff;
+    }
+
+    .container_about {
+        width: 90%;
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        
+        padding: 50px;
+    }
+
+    .about-hero .container_about, .about-team .container_about {
+        background: #f5fbff;
+    }
+    .about-hero-content h1 {
+        font-size: 42px;
+        color: #1a1a1a;
+    }
+
+    .sub-title, .label {
+        color: #4f8cff;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .values-grid, .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .value-card {
+        background: #f5f9ff;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+        .value-card i {
+            font-size: 25px;
+            color: #4f8cff;
+        }
+    .stat h3 {
+        color: #4f8cff;
+        font-size: 32px;
+    }
+    img{
+        margin: 0 20px;
+    }
+</style>

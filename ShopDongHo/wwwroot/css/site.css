@@ -1,0 +1,368 @@
+﻿@media (min-width: 1200px) {
+    .container {
+        width: 1170px;
+    }
+}
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f1f5f9;
+}
+
+/* TOPBAR */
+.topbar {
+    height: 60px;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.topbar .left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-box {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+
+.topbar .right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.icon {
+    font-size: 18px;
+    color: #555;
+}
+
+/* USER */
+.user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 40px;
+    border-radius: 50%;
+}
+
+.user .name {
+    font-weight: 500;
+}
+
+.user .role {
+    font-size: 12px;
+    color: #888;
+}
+
+/* DROPDOWN */
+.dropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: #fff;
+    width: 150px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.user:hover .dropdown {
+    display: block;
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown {
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s;
+}
+
+.dropdown.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.dropdown a:hover {
+    background: #f1f5f9;
+}
+
+/* LAYOUT */
+.layout {
+    display: flex;
+}
+
+
+/* SIDEBAR FIX CỨNG */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: linear-gradient(180deg, #0f172a, #1e293b);
+    color: #fff;
+}
+
+/* TOPBAR ĐẨY QUA PHẢI */
+.topbar {
+    margin-left: 240px;
+}
+
+/* CONTENT ĐẨY QUA PHẢI */
+.content {
+    margin-left: 240px;
+    padding: 25px;
+}
+
+.logo {
+    padding: 15px 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.menu {
+    display: block;
+    padding: 12px 20px;
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.menu i {
+    margin-right: 10px;
+}
+
+.menu:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    padding-left: 25px;
+}
+
+.menu.active {
+    background: rgba(59,130,246,0.3);
+    color: #fff;
+}
+
+/* LOGOUT */
+.logout {
+    position: absolute;
+    bottom: 20px;
+    width: 240px;
+}
+
+.logout a {
+    display: block;
+    padding: 12px 20px;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* CONTENT */
+.content {
+    flex: 1;
+    padding: 25px;
+}
+
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+}
+
+.logo i {
+    font-size: 20px;
+}
+
+
+
+
+/* CARD */
+.product-card {
+background: #ffffff;
+border-radius: 8px;
+overflow: hidden;
+transition: all 0.3s ease;
+border: 1px solid #e6eaf0;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 50, 0.1);
+}
+
+/* IMAGE */
+.product-image {
+background: #f8fafc;
+padding: 10px;
+text-align: center;
+}
+
+.product-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: 0.3s;
+    border-radius: 5px;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+/* CONTENT */
+.product-content {
+    padding: 15px;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a1f44; /* navy */
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-brand {
+    font-size: 13px;
+    color: #6c7a89;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a1f44;
+    margin-top: 8px;
+}
+
+/* BUTTON */
+.product-actions {
+    padding: 0 5px 5px;
+}
+
+.btn-add-cart {
+    width: 100%;
+    background: #0a1f44;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+    .btn-add-cart:hover {
+        background: #142f66;
+    }
+
+.btn-out-stock {
+    width: 100%;
+    background: #ccc;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.btn_cart_icon {
+    font-size: 20px;
+}
+/* EXTRA */
+.product-extra {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px 15px;
+}
+
+.product-extra button {
+    background: transparent;
+    border: 1px solid #0a1f44;
+    color: #0a1f44;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    transition: 0.3s;
+}
+
+    .product-extra button:hover {
+        background: #0a1f44;
+        color: white;
+    }
+
+.pro_price_addCart {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* để định vị icon */
+.product-image {
+    position: relative;
+}
+
+/* ICON TIM */
+.add-wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0a1f44; /* navy */
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* hover */
+.add-wishlist-icon:hover {
+    background: #0a1f44;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* khi đã thích */
+.add-wishlist-icon.active {
+    background: #e63946;
+    color: #fff;
+}
+
+.col-lg-3, .col-md-4, .col-sm-6 {
+padding: 10px;
+}
+
+h2.title {
+color: #0a1f44;
+}
+

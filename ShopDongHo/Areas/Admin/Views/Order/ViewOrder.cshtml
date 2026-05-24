@@ -1,0 +1,250 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<OrderDetails>
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    decimal total = 0;
+    decimal subtotal = 0;
+    var orderCode = Model.FirstOrDefault()?.OrderCode;
+    var userName = Model.FirstOrDefault()?.UserName;
+}
+
+<div class="order-detail-container">
+
+    <!-- HEADER -->
+    <div class="od-header">
+        <h1>Chi tiết đơn hàng</h1>
+        <p>Mã đơn: <b>#@orderCode</b> | Khách: @userName</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="od-card">
+        <table class="table od-table" id="order_detail">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Tạm tính</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @{
+                    int i = 0;
+                }
+
+                @foreach (var item in Model)
+                {
+                    i++;
+                    subtotal = item.Price * item.Quantity;
+                    total += subtotal;
+
+                    <tr>
+                        <input type="hidden" value="@item.OrderCode" class="getId" />
+
+                        <td>@i</td>
+
+                        <td class="od-product">
+                            @item.Product.Name
+                        </td>
+
+                        <td>@item.Price.ToString("#,##0") đ</td>
+
+                        <td>@item.Quantity</td>
+
+                        <td class="od-subtotal">
+                            @subtotal.ToString("#,##0") đ
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="od-summary">
+
+        <div class="od-box">
+            <span>Tổng tiền</span>
+            <strong>@total.ToString("#,##0") đ</strong>
+        </div>
+
+        <div class="od-box">
+            <span>Phí vận chuyển</span>
+            <strong>@ViewBag.ShippingCost.ToString("#,##0") đ</strong>
+        </div>
+
+        <div class="od-box total">
+            <span>Thanh toán</span>
+            <strong>
+                @(total + (decimal)ViewBag.ShippingCost) đ
+            </strong>
+        </div>
+
+        <!-- STATUS -->
+        <div class="od-status">
+            @if (ViewBag.Status != 3)
+            {
+                <select class="od-select select-update-order">
+                    <option value="1">Đơn mới</option>
+                    <option value="2">Hoàn thành</option>
+                    <option value="3">Hủy</option>
+                </select>
+            }
+            else
+            {
+                <span class="badge badge-cancel">Đã hủy</span>
+            }
+        </div>
+
+    </div>
+
+</div>
+@section Scripts {
+    <script>
+        new DataTable('#order_detail', {
+            layout: {
+                topStart: {
+                    buttons: ['pdf','print']
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function (){
+            $('.select-update-order').change(function(){
+                var status = $(this).val();
+                var ordercode = $('.getId').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateOrder")",
+                    data: {status: status, ordercode: ordercode},
+
+                    success: function (result){
+                        if(result.success){
+                            Swal.fire("Update successful");
+                        }else{
+                             Swal.fire("Update failed: "+ result.message);
+                        }
+                    },
+                });
+            });
+        });
+    </script>
+
+}
+<style>
+    .order-detail-container {
+        padding: 25px;
+        background: #f7f9fc;
+    }
+
+    /* HEADER */
+    .od-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #0b1f3a;
+    }
+
+    .od-header p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    /* CARD */
+    .od-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .od-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+    .od-table th {
+        border: none;
+        padding: 12px;
+    }
+
+    .od-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* PRODUCT */
+    .od-product {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* SUBTOTAL */
+    .od-subtotal {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* SUMMARY */
+    .od-summary {
+        margin-top: 20px;
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .od-box {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        flex: 1;
+        min-width: 150px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+        .od-box span {
+            display: block;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .od-box strong {
+            font-size: 18px;
+            color: #0b1f3a;
+        }
+
+        .od-box.total {
+            background: #0b1f3a;
+            color: #fff;
+        }
+
+            .od-box.total strong {
+                color: #fff;
+            }
+
+    /* STATUS */
+    .od-status {
+        display: flex;
+        align-items: center;
+    }
+
+    .od-select {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+    }
+
+    /* BADGE */
+    .badge-cancel {
+        background: #fdeaea;
+        color: #dc3545;
+        padding: 6px 10px;
+        border-radius: 20px;
+    }
+</style>

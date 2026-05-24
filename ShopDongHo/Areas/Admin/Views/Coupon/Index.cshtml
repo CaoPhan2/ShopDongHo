@@ -1,0 +1,287 @@
+﻿@using ShopDongHo.Models
+@model CouponModel
+@{
+    ViewData["Title"] = "Create Coupon";
+}
+
+<div class="container mt-4">
+
+    <!-- TITLE -->
+    <div class="page-header mb-4">
+        <h2>Tạo Mã giảm giá</h2>
+        <p class="text-muted">Tạo mã giảm giá cho khách hàng</p>
+    </div>
+
+    <!-- FORM -->
+    <div class="card custom-card mb-4">
+        <div class="card-body">
+
+            <form asp-action="Create" asp-controller="Coupon" autocomplete="off">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Mã giảm giá</label>
+                        <input asp-for="Code" class="form-control custom-input" />
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Tên mã giảm giá</label>
+                        <input asp-for="Name" class="form-control custom-input" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Loại mã</label>
+                        <select asp-for="DiscountType" class="form-control custom-input">
+                            <option value="percent">Giảm theo %</option>
+                            <option value="money">Giảm theo tiền</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Trạng thái</label>
+                        <select asp-for="Status" class="form-control custom-input">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Giá trị giảm (%)</label>
+                        <input asp-for="DiscountPercent" class="form-control custom-input" />
+                        <span asp-validation-for="DiscountPercent" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Giá trị giảm</label>
+                        <input asp-for="DiscountAmount" class="form-control custom-input" />
+                        <span asp-validation-for="DiscountAmount" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Mô tả </label>
+                    <textarea asp-for="Description" class="form-control custom-input"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Số Lượng</label>
+                        <input asp-for="Quantity" class="form-control custom-input" />
+                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Ngày bắt đầu</label>
+                        <input asp-for="DateStart" type="date" class="form-control custom-input" />
+                        <span asp-validation-for="DateStart" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Ngày hết hạn</label>
+                        <input asp-for="DateExpired" type="date" class="form-control custom-input" />
+                        <span asp-validation-for="DateExpired" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <button class="btn btn-navy">
+                    + Tạo mã giảm giá
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="card custom-card">
+        <div class="card-body">
+
+            <h5 class="mb-3">Coupon list</h5>
+
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Discount</th>
+                        <th>Description</th>
+                        <th>Start</th>
+                        <th>Expired</th>
+                        <th>Qty</th>
+                        <th>Active</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in ViewBag.Coupons)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+
+                            <td>@item.Name</td>
+
+                            <!-- DISCOUNT TYPE -->
+                            <td>
+                                @if (item.DiscountType == "percent")
+                                {
+                                    <span class="badge bg-primary">
+                                        Percent
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-dark">
+                                        Money
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- DISCOUNT VALUE -->
+                            <td>
+                                @if (item.DiscountType == "percent")
+                                {
+                                    <span>
+                                        @item.DiscountPercent %
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>
+                                        @item.DiscountAmount.ToString("#,##0") đ
+                                    </span>
+                                }
+                            </td>
+
+                            <td>@item.Description</td>
+
+                            <td>
+                                @item.DateStart.ToString("dd-MM-yyyy")
+                            </td>
+
+                            <td>
+                                @item.DateExpired.ToString("dd-MM-yyyy")
+                            </td>
+
+                            <td>@item.Quantity</td>
+
+                            <!-- ACTIVE -->
+                            <td>
+                                @if (item.Status == 1)
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        Hidden
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- TIME STATUS -->
+                            <td>
+                                @if (item.DateExpired < DateTime.Now)
+                                {
+                                    <span class="badge bg-danger">
+                                        Expired
+                                    </span>
+                                }
+                                else
+                                {
+                                    TimeSpan time = item.DateExpired - DateTime.Now;
+
+                                    if (time.Days == 0)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Today
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            @time.Days days left
+                                        </span>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<style>
+    /* CARD */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    /* INPUT */
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #dcdfe6;
+    }
+
+        .custom-input:focus {
+            border-color: #0b1f3a;
+            box-shadow: 0 0 0 2px rgba(11,31,58,0.1);
+        }
+
+    /* BUTTON */
+    .btn-navy {
+        background: #0b1f3a;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+        margin-top: 15px;
+    }
+
+        .btn-navy:hover {
+            background: #132c52;
+            color: white;
+        }
+
+    /* TABLE */
+    .custom-table thead {
+        background: #f5f7fb;
+    }
+
+    .custom-table tbody tr:hover {
+        background: #f9fafc;
+    }
+
+    /* BADGE CUSTOM */
+    .badge {
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+</style>

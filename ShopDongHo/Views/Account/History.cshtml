@@ -1,0 +1,230 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<OrderModel>
+
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+}
+
+<div class="order-container">
+
+    <!-- HEADER -->
+    <div class="order-header">
+        <h1>Lịch sử mua hàng</h1>
+        <p>Khách hàng: @ViewBag.UserEmail</p>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="order-card">
+        <table class="table order-table" id="myTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Mã đơn</th>
+                    <th>Mã giảm</th>
+                    <th>Phí ship</th>
+                    <th>Người nhận</th>
+                    <th>Ngày</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+
+                        <td class="order-code">
+                            #@item.OrderCode
+                        </td>
+
+                        <td>
+                            @(string.IsNullOrEmpty(item.CouponCode) ? "-" : item.CouponCode)
+                        </td>
+
+                        <td>
+                            @item.ShippingCost.ToString("#,##0") đ
+                        </td>
+
+                        <td>@item.UserName</td>
+
+                        <td>
+                            @item.CreateDate.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <!-- PAYMENT -->
+                        <td>
+                            @if (item.PaymentMethod == "COD")
+                            {
+                                <span class="badge badge-cod">COD</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-online">@item.PaymentMethod</span>
+                            }
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            @if (item.Status == 1)
+                            {
+                                <span class="badge badge-new">New</span>
+                            }
+                            else if (item.Status == 2)
+                            {
+                                <span class="badge badge-done">Finished</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-cancel">Cancelled</span>
+                            }
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            <div class="o-action">
+                                @if (item.Status != 3)
+                                {
+                                    <a class="btn-delete"
+                                       onclick="return confirm('Xác nhận hủy đơn hàng?')"
+                                       asp-controller="Account"
+                                       asp-action="CancelOrder"
+                                       asp-route-ordercode="@item.OrderCode">
+                                        Hủy
+                                    </a>
+                                }
+                                <a class="btn-view"
+                                   asp-controller="Account"
+                                   asp-action="ViewOrder"
+                                   asp-route-ordercode="@item.OrderCode">
+                                    Xem
+                                </a>
+                            </div>
+                            
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<style>
+    /* HEADER */
+    .order-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #0b1f3a;
+        margin-bottom: 5px;
+    }
+
+    .order-header p {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    /* CARD */
+    .order-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .order-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+        .order-table thead th {
+            border: none;
+            font-weight: 500;
+            padding: 12px;
+        }
+
+    .order-table tbody tr {
+        transition: 0.3s;
+    }
+
+        .order-table tbody tr:hover {
+            background: #f8f9fc;
+        }
+
+    /* ORDER CODE */
+    .order-code {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* BADGE */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    /* PAYMENT */
+    .badge-cod {
+        background: #ffe5e5;
+        color: #dc3545;
+    }
+
+    .badge-online {
+        background: #e6f0ff;
+        color: #1a73e8;
+    }
+
+    /* STATUS */
+    .badge-new {
+        background: #e7f5ff;
+        color: #0d6efd;
+    }
+
+    .badge-done {
+        background: #e6f7ee;
+        color: #28a745;
+    }
+
+    .badge-cancel {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+    /* BUTTON CANCEL */
+    /* ACTION */
+    .o-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-view {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #0b1f3a;
+        color: #fff;
+        text-decoration: none;
+    }
+
+        .btn-view:hover {
+            background: #142f55;
+        }
+
+    .btn-delete {
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+</style>

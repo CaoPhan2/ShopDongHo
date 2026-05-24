@@ -1,0 +1,140 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<OrderDetails>
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    decimal total = 0;
+    decimal subtotal = 0;
+    var orderCode = Model.FirstOrDefault()?.OrderCode;
+    var userName = Model.FirstOrDefault()?.UserName;
+}
+
+<div class="order-detail-container">
+
+    <!-- HEADER -->
+    <div class="od-header">
+        <h1>Chi tiết đơn hàng</h1>
+        <p>Mã đơn: <b>#@orderCode</b> <br /> Khách hàng: @userName</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="od-card">
+        <table class="table od-table" id="order_detail">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Tạm tính</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @{
+                    int i = 0;
+                }
+
+                @foreach (var item in Model)
+                {
+                    i++;
+                    subtotal = item.Price * item.Quantity;
+                    total += subtotal;
+
+                    <tr>
+                        <input type="hidden" value="@item.OrderCode" class="getId" />
+
+                        <td>@i</td>
+
+                        <td class="od-product">
+                            @item.Product.Name
+                        </td>
+
+                        <td>@item.Price.ToString("#,##0") đ</td>
+
+                        <td>@item.Quantity</td>
+
+                        <td class="od-subtotal">
+                            @subtotal.ToString("#,##0") đ
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="od-summary">
+
+        <div class="od-box">
+            <span>Tổng tiền</span>
+            <strong>@total.ToString("#,##0") đ</strong>
+        </div>
+
+        <div class="od-box">
+            <span>Phí vận chuyển</span>
+            <strong>@ViewBag.ShippingCost.ToString("#,##0") đ</strong>
+        </div>
+
+        <div class="od-box total">
+            <span>Thanh toán</span>
+            <strong>
+                @((total + (decimal)ViewBag.ShippingCost).ToString("N0")) đ
+            </strong>
+        </div>
+
+        <!-- STATUS -->
+        <div class="od-status">
+            @if (ViewBag.Status ==1)
+            {
+                <span class="od-box text text-warning">Đang xử lý</span>
+            }else if(ViewBag.Status == 2)
+            {
+                <span class="od-box text text-success">Đã hoàn thành</span>
+            }
+            else
+            {
+                <span class="od-box text text-danger">Đã hủy</span>
+            }
+        </div>
+        
+
+    </div>
+    <a class="linkback" asp-action="History" asp-controller="Account">Trở lại danh sách đơn hàng</a>
+</div>
+@section Scripts {
+    <script>
+        new DataTable('#order_detail', {
+            layout: {
+                topStart: {
+                    buttons: ['pdf','print']
+                }
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function (){
+            $('.select-update-order').change(function(){
+                var status = $(this).val();
+                var ordercode = $('.getId').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateOrder")",
+                    data: {status: status, ordercode: ordercode},
+
+                    success: function (result){
+                        if(result.success){
+                            Swal.fire("Update successful");
+                        }else{
+                             Swal.fire("Update failed: "+ result.message);
+                        }
+                    },
+                });
+            });
+        });
+    </script>
+
+}

@@ -1,0 +1,167 @@
+﻿@using ShopDongHo.Models
+@model ProductModel
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+
+
+<div class="wrapper">
+    <div class="form-card">
+        <h2>Update Product</h2>
+
+        <form asp-action="Edit" asp-controller="Product" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+           
+            <div class="form-group">
+                <label>Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Price</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Capital Price</label>
+                <input asp-for="CapitalPrice" class="form-control" />
+                <span asp-validation-for="CapitalPrice" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                    <option value="">-- Choose category --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Brand</label>
+                <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brands">
+                    <option value="">-- Choose brand --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Image</label>
+                <input asp-for="ImageUpload" type="file" class="form-control" />
+
+                <img src="~/media/products/@Model.Images"
+                     width="100"
+                     class="preview-img" />
+            </div>
+
+            <button class="btn-submit">Update Product</button>
+        </form>
+
+        <a asp-action="Index" class="back-link">← Back to list</a>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('Description');
+    </script>
+}
+
+<style>
+    body {
+        background: #f1f5f9;
+    }
+
+    .wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 0;
+    }
+
+    .form-card {
+        background: white;
+        width: 600px;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+        .form-card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+        color: #334155;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+    }
+
+        .form-control:focus {
+            border-color: #0f172a;
+            box-shadow: none;
+        }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background: #0f172a;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+        .btn-submit:hover {
+            background: #1e293b;
+        }
+
+    .preview-img {
+        margin-top: 10px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+</style>

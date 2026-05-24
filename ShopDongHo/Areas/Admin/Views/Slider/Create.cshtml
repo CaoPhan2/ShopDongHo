@@ -1,0 +1,152 @@
+﻿@using ShopDongHo.Models
+@model SliderModel
+
+@{
+    ViewData["Title"] = "Create Slider";
+}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header mb-4">
+        <h2>Thêm Slider</h2>
+        <p class="text-muted">Thêm banner slider cho trang chủ</p>
+    </div>
+
+    <!-- FORM -->
+    <div class="card custom-card">
+        <div class="card-body">
+
+            <form asp-action="Create" enctype="multipart/form-data">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row">
+                    <!-- NAME -->
+                    <div class="col-md-6 mb-3">
+                        <label>Tên</label>
+                        <input asp-for="Name" class="form-control custom-input" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="col-md-6 mb-3">
+                        <label>Trạng thái</label>
+                        <select asp-for="Status" class="form-control custom-input">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="form-group mb-3">
+                    <label>Mô tả</label>
+                    <textarea asp-for="Description" class="form-control custom-input"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- IMAGE -->
+                <div class="form-group mb-3">
+                    <label>Hình ảnh</label>
+                    <input asp-for="ImageUpload" type="file" class="form-control custom-input" />
+                    <span asp-validation-for="ImageUpload" class="text-danger"></span>
+
+                    <!-- PREVIEW -->
+                    <div class="mt-3">
+                        <img id="imgpreview" class="img-preview" />
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="back-link">
+                        ← Quay lại
+                    </a>
+
+                    <button class="btn btn-navy">
+                        + Tạo Slider
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- CKEDITOR -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('Description');
+    </script>
+
+    <!-- IMAGE PREVIEW -->
+    <script>
+        $("#ImageUpload").change(function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#imgpreview").attr("src", e.target.result).fadeIn();
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}
+<style>
+    /* CARD */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    /* INPUT */
+    .custom-input {
+        border-radius: 8px;
+        border: 1px solid #dcdfe6;
+    }
+
+        .custom-input:focus {
+            border-color: #0b1f3a;
+            box-shadow: 0 0 0 2px rgba(11,31,58,0.1);
+        }
+
+    /* BUTTON */
+    .btn-navy {
+        background: #0b1f3a;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+    }
+
+        .btn-navy:hover {
+            background: #132c52;
+        }
+
+    /* IMAGE PREVIEW */
+    .img-preview {
+        width: 200px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        display: none;
+    }
+
+    /* BACK LINK */
+    .back-link {
+        color: #0b1f3a;
+        text-decoration: none;
+    }
+</style>

@@ -1,0 +1,267 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<OrderModel>
+
+@{
+    ViewData["Title"] = "Đơn hàng";
+}
+
+<div class="order-container">
+
+    <!-- HEADER -->
+    <div class="order-header">
+        <h1>Quản lý đơn hàng</h1>
+        <p>Danh sách tất cả đơn hàng trong hệ thống</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="order-card">
+        <table class="table order-table" id="myTable">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Mã đơn</th>
+                    <th>Mã giảm</th>
+                    <th>Phí ship</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày</th>
+                    <th>Thanh toán</th>
+                    <th>Trạng thái</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+
+                        <td class="o-code">#@item.OrderCode</td>
+
+                        <td>
+                            @(string.IsNullOrEmpty(item.CouponCode) ? "-" : item.CouponCode)
+                        </td>
+
+                        <td>
+                            @item.ShippingCost.ToString("#,##0") đ
+                        </td>
+
+                        <td>@item.UserName</td>
+
+                        <td>
+                            @item.CreateDate.ToString("dd/MM/yyyy")
+                        </td>
+
+                        <!-- PAYMENT -->
+                        <td>
+                            @{
+                                string text = item.PaymentMethod;
+                                string method = "";
+                                string orderId = "";
+
+                                if (!string.IsNullOrEmpty(text))
+                                {
+                                    var parts = text.Split(" ");
+                                    if (parts.Length > 1)
+                                    {
+                                        method = parts[0];
+                                        orderId = parts[1];
+                                    }
+                                }
+                            }
+
+                            @if (string.IsNullOrEmpty(item.PaymentMethod))
+                            {
+                                <span class="badge badge-cod">COD</span>
+                            }
+                            else if (method == "MOMO")
+                            {
+                                <span class="badge badge-momo">MoMo</span>
+                                <a class="link-payment"
+                                   asp-controller="Order"
+                                   asp-action="PaymentMomoInfo"
+                                   asp-route-orderId="@orderId">
+                                    Chi tiết
+                                </a>
+                            }
+                            else if (method == "VnPay")
+                            {
+                                <span class="badge badge-vnpay">VNPay</span>
+                                <a class="link-payment"
+                                   asp-controller="Order"
+                                   asp-action="PaymentVnpayInfo"
+                                   asp-route-orderId="@orderId">
+                                    Chi tiết
+                                </a>
+                            }
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            @if (item.Status == 1)
+                            {
+                                <span class="badge badge-new">Mới</span>
+                            }
+                            else if (item.Status == 2)
+                            {
+                                <span class="badge badge-done">Hoàn thành</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-cancel">Đã hủy</span>
+                            }
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            <div class="o-action">
+                                <a class="btn-view"
+                                   asp-controller="Order"
+                                   asp-action="ViewOrder"
+                                   asp-route-ordercode="@item.OrderCode">
+                                    Xem
+                                </a>
+
+                                <a class="btn-delete confirmDeletion"
+                                   asp-controller="Order"
+                                   asp-action="Delete"
+                                   asp-route-Id="@item.Id">
+                                    Xóa
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+<style>
+    /* CONTAINER */
+    .order-container {
+        padding: 25px;
+        background: #f7f9fc;
+    }
+
+    /* HEADER */
+    .order-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #0b1f3a;
+    }
+
+    .order-header p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    /* CARD */
+    .order-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    /* TABLE */
+    .order-table thead {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+    .order-table th {
+        border: none;
+        padding: 12px;
+    }
+
+    .order-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+    /* CODE */
+    .o-code {
+        font-weight: 500;
+        color: #0b1f3a;
+    }
+
+    /* BADGE */
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    /* PAYMENT */
+    .badge-cod {
+        background: #eee;
+        color: #333;
+    }
+
+    .badge-momo {
+        background: #ffe0f0;
+        color: #d82d8b;
+    }
+
+    .badge-vnpay {
+        background: #e6f0ff;
+        color: #1a73e8;
+    }
+
+    /* STATUS */
+    .badge-new {
+        background: #e7f5ff;
+        color: #0d6efd;
+    }
+
+    .badge-done {
+        background: #e6f7ee;
+        color: #28a745;
+    }
+
+    .badge-cancel {
+        background: #fdeaea;
+        color: #dc3545;
+    }
+
+    /* PAYMENT LINK */
+    .link-payment {
+        display: block;
+        font-size: 12px;
+        color: #0b1f3a;
+    }
+
+    /* ACTION */
+    .o-action {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-view {
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: #0b1f3a;
+        color: #fff;
+        text-decoration: none;
+    }
+
+        .btn-view:hover {
+            background: #142f55;
+        }
+
+    .btn-delete {
+        padding: 5px 10px;
+        border-radius: 8px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-decoration: none;
+    }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+</style>

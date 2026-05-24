@@ -1,0 +1,12 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<BrandModel>
+
+@foreach(var item in Model)
+{
+    <li><a asp-action="Index" asp-controller="Brand" asp-route-Slug="@item.Slug"> <span class="pull-right"></span>@item.Name</a></li>
+}
+<style>
+    .brands-name .nav-stacked li a {
+        color: #0a1f44;
+    }
+</style>

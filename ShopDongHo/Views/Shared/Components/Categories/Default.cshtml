@@ -1,0 +1,33 @@
+﻿@using ShopDongHo.Models
+@model IEnumerable<CategoryModel>
+
+@foreach(var item in Model)
+{
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a asp-controller="Category" asp-action="Index" asp-route-Slug="@item.Slug">
+					<span class="badge pull-right"><i class="fa fa-clock-o"></i></span>
+                    @item.Name
+				</a>
+			</h4>
+		</div>
+		
+	</div>
+}
+
+<style>
+	.panel-title {
+		font-size: 18px;
+		font-weight: bold;
+		color: #0a1f44;
+	}
+
+	.category-products .panel-default .panel-heading .panel-title a, .category-products .badge {
+		
+		color: #0a1f44;
+	}
+
+	
+	
+</style>

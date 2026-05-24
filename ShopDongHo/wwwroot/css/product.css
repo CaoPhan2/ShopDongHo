@@ -1,0 +1,164 @@
+﻿/* CARD */
+.product-card {
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e6eaf0;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 50, 0.1);
+    }
+
+/* IMAGE */
+.product-image {
+    background: #f8fafc;
+    padding: 10px;
+    text-align: center;
+}
+
+    .product-image img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        transition: 0.3s;
+        border-radius: 5px;
+    }
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+/* CONTENT */
+.product-content {
+    padding: 15px;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0a1f44; /* navy */
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-brand {
+    font-size: 13px;
+    color: #6c7a89;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0a1f44;
+    margin-top: 8px;
+}
+
+/* BUTTON */
+.product-actions {
+    padding: 0 5px 5px;
+}
+
+.btn-add-cart {
+    width: auto;
+    background: #0a1f44;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+    .btn-add-cart:hover {
+        background: #142f66;
+    }
+
+.btn-out-stock {
+    width: 100%;
+    background: #ccc;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.btn_cart_icon {
+    font-size: 20px;
+}
+/* EXTRA */
+.product-extra {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px 15px;
+}
+
+    .product-extra button {
+        background: transparent;
+        border: 1px solid #0a1f44;
+        color: #0a1f44;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        transition: 0.3s;
+    }
+
+        .product-extra button:hover {
+            background: #0a1f44;
+            color: white;
+        }
+
+.pro_price_addCart {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* để định vị icon */
+.product-image {
+    position: relative;
+}
+
+/* ICON TIM */
+.add-wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0a1f44; /* navy */
+    font-size: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    /* hover */
+    .add-wishlist-icon:hover {
+        background: #0a1f44;
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    /* khi đã thích */
+    .add-wishlist-icon.active {
+        background: #FE980F;
+        color: #fff;
+    }
+
+.col-lg-3, .col-md-4, .col-sm-6 {
+    padding: 10px;
+}
+
+h2.title {
+    color: #0a1f44;
+}
+
+

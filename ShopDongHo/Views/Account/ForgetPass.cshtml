@@ -1,0 +1,36 @@
+﻿@using ShopDongHo.Models
+@model AppUserModel
+@{
+	ViewData["title"] = "Forget Pass";
+}
+<section id="">
+	<!--form-->
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-8 col-sm-offset-1">
+				<div class="login-form">
+					<!--login form-->
+					<h2>Login to your account</h2>
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<form asp-action="SendMailForgotPass" asp-controller="Account">
+						<div class="form-group">
+							<labe>Email</labe>
+							<input asp-for="Email" class="form-control" />
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+						
+						<button class="btn btn-default">Send</button>
+					</form>
+					<a asp-action="Create" asp-controller="Account">Create a new account</a>
+					
+				</div><!--/login form-->
+			</div>
+
+		</div>
+	</div>
+</section><!--/form-->
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

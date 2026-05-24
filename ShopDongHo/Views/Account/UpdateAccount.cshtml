@@ -1,0 +1,60 @@
+﻿@using ShopDongHo.Models
+@model AppUserModel
+@{
+	ViewData["title"] = "Update Account Infor";
+}
+<section>
+	<!--form-->
+	<div class="container">
+		<div class="row">
+
+			<div class="col-sm-8" col-sm-offset-1>
+				<div class="signup-form">
+					<!--sign up form-->
+					<h2>Update Account Information</h2>
+
+					<form autocomplete="off" asp-action="UpdateInfoAccount" asp-controller="Account" method="post">
+                        <input type="hidden" asp-for="Id" />
+						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+						<div class="form-group">
+							<labe>UserName</labe>
+							<input asp-for="UserName" readonly required class="form-control" />
+							<span asp-validation-for="UserName" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<labe>Email</labe>
+							<input asp-for="Email" readonly required class="form-control" />
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<labe>Phone Number</labe>
+							<input asp-for="PhoneNumber" required class="form-control" />
+							<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<labe>Old Password</labe>
+							<input type="text" readonly value="@Model.PasswordHash" class="form-control" />
+							
+						</div>
+						<div class="form-group">
+							<labe>New Password</labe>
+							<input type="text" name="PasswordHash" required class="form-control" />
+							<span asp-validation-for="PasswordHash" class="text-danger"></span>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-default">Update</button>
+						</div>
+						
+					</form>
+
+					
+				</div><!--/sign up form-->
+			</div>
+		</div>
+	</div>
+</section><!--/form-->
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+}

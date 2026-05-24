@@ -1,0 +1,242 @@
+﻿@using ShopDongHo.Models.ViewModel
+@model LoginViewModel
+@{
+    ViewData["title"] = "Login";
+}
+
+<section class="login-section">
+
+    <div class="login-box">
+        <h2>Đăng nhập</h2>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <form asp-action="Login" asp-controller="Account">
+
+            <div class="form-group">
+                <label>User Name</label>
+                <input asp-for="UserName" class="form-control" placeholder="Nhập username..." />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu..." />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn-login">Đăng nhập</button>
+        </form>
+
+        <a class="btn-google" asp-action="LoginByGoogle" asp-controller="Account">
+            <i class="fa-brands fa-google"></i> Đăng nhập với Google
+        </a>
+
+        <div class="extra-links">
+            <a asp-action="Create" asp-controller="Account">Tạo tài khoản</a>
+            <a asp-action="ForgetPass" asp-controller="Account">Quên mật khẩu?</a>
+        </div>
+
+    </div>
+
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<style>
+
+	.login-section {
+		min-height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: #f5f5f5;
+	}
+
+	.login-box {
+		width: 100%;
+		max-width: 380px;
+		background: #fff;
+		padding: 30px 25px;
+		border-radius: 8px;
+		border: 1px solid #eee;
+	}
+
+		.login-box h2 {
+			text-align: center;
+			margin-bottom: 20px;
+			font-weight: 600;
+		}
+
+	.form-group {
+		margin-bottom: 15px;
+	}
+
+	.form-control {
+		width: 100%;
+		height: 42px;
+		border-radius: 6px;
+		border: 1px solid #ddd;
+		padding: 0 10px;
+	}
+
+	.btn-login {
+		width: 100%;
+		background: #0b1f3a;
+		color: #fff;
+		border: none;
+		height: 42px;
+		border-radius: 6px;
+		margin-top: 10px;
+		cursor: pointer;
+	}
+
+		.btn-login:hover {
+			background: #222;
+		}
+
+	.btn-google {
+		display: block;
+		text-align: center;
+		margin-top: 15px;
+		padding: 10px;
+		border: 1px solid #ddd;
+		border-radius: 6px;
+		color: #333;
+		text-decoration: none;
+	}
+
+	.extra-links {
+		margin-top: 15px;
+		display: flex;
+		justify-content: space-between;
+	}
+
+		.extra-links a {
+			font-size: 13px;
+			color: #555;
+			text-decoration: none;
+		}
+
+
+	/*	============View Order ==========*/
+
+	.order-detail-container {
+		padding: 25px;
+		background: #f7f9fc;
+	}
+
+	/* HEADER */
+	.od-header h1 {
+		font-size: 24px;
+		font-weight: 600;
+		color: #0b1f3a;
+	}
+
+	.od-header p {
+		color: #6c757d;
+		margin-bottom: 20px;
+	}
+
+	/* CARD */
+	.od-card {
+		background: #fff;
+		padding: 20px;
+		border-radius: 14px;
+		box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+	}
+
+	/* TABLE */
+	.od-table thead {
+		background: #0b1f3a;
+		color: #fff;
+	}
+
+	.od-table th {
+		border: none;
+		padding: 12px;
+	}
+
+	.od-table tbody tr:hover {
+		background: #f8f9fc;
+	}
+
+	/* PRODUCT */
+	.od-product {
+		font-weight: 500;
+		color: #0b1f3a;
+	}
+
+	/* SUBTOTAL */
+	.od-subtotal {
+		font-weight: 500;
+		color: #0b1f3a;
+	}
+
+	/* SUMMARY */
+	.od-summary {
+		margin-top: 20px;
+		display: flex;
+		gap: 15px;
+		flex-wrap: wrap;
+	}
+
+	.od-box {
+		background: #fff;
+		padding: 15px;
+		border-radius: 12px;
+		flex: 1;
+		min-width: 150px;
+		box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+	}
+
+		.od-box span {
+			display: block;
+			font-size: 13px;
+			color: #777;
+		}
+
+		.od-box strong {
+			font-size: 18px;
+			color: #0b1f3a;
+		}
+
+		.od-box.total {
+			background: #0b1f3a;
+			color: #fff;
+		}
+
+			.od-box.total strong {
+				color: #fff;
+			}
+
+	/* STATUS */
+	.od-status {
+		display: flex;
+		align-items: center;
+	}
+
+	.od-select {
+		padding: 10px;
+		border-radius: 8px;
+		border: 1px solid #ddd;
+	}
+
+	/* BADGE */
+	.badge-cancel {
+		background: #fdeaea;
+		color: #dc3545;
+		padding: 6px 10px;
+		border-radius: 20px;
+	}
+
+	.linkback {
+		display: inline-block;
+		margin-top: 20px;
+		text-decoration: none;
+		font-weight: 500;
+	}
+</style>

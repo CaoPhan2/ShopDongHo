@@ -1,0 +1,78 @@
+﻿<div class="left-sidebar">
+	<h2>Danh Mục Sản Phẩm</h2>
+	<div class="panel-group category-products" id="accordian">
+		<!--category-productsr-->
+		<vc:categories></vc:categories>
+		
+	</div><!--/category-products-->
+
+	<div class="brands_products">
+		<!--brands_products-->
+		<h2>Thương Hiệu </h2>
+		<div class="brands-name">
+			<ul class="nav nav-pills nav-stacked">
+                <vc:brands></vc:brands>
+				
+			</ul>
+		</div>
+	</div><!--/brands_products-->
+
+    <div class="sidebar-filter">
+
+        <form asp-action="Index" asp-controller="Home" method="get">
+
+            <div class="filter-top">
+                <h4>LỌC THEO GIÁ</h4>
+
+                <a asp-action="Index" asp-controller="Product">
+                    Xóa bộ lọc
+                </a>
+            </div>
+
+            <div class="filter-list">
+
+                <label class="filter-item">
+                    <input type="radio" name="price" value="duoi-1-trieu"
+                           onchange="this.form.submit()">
+
+                    <span>Dưới 1 triệu</span>
+                </label>
+
+                <label class="filter-item">
+                    <input type="radio" name="price" value="1-3-trieu"
+                           onchange="this.form.submit()">
+
+                    <span>1 - 3 triệu</span>
+                </label>
+
+                <label class="filter-item">
+                    <input type="radio" name="price" value="3-5-trieu"
+                           onchange="this.form.submit()">
+
+                    <span>3 - 5 triệu</span>
+                </label>
+
+                <label class="filter-item">
+                    <input type="radio" name="price" value="5-10-trieu"
+                           onchange="this.form.submit()">
+
+                    <span>5 - 10 triệu</span>
+                </label>
+
+                <label class="filter-item">
+                    <input type="radio" name="price" value="tren-10-trieu"
+                           onchange="this.form.submit()">
+
+                    <span>Trên 10 triệu</span>
+                </label>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<style>
+	
+</style>

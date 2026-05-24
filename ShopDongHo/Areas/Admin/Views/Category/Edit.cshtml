@@ -1,0 +1,111 @@
+﻿@using ShopDongHo.Models
+@model CategoryModel
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<style>
+    .card-custom {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+    }
+
+    .title-custom {
+        color: #0a1f44;
+        font-weight: 600;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: #0a1f44;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #dce1e7;
+        padding: 10px;
+    }
+
+        .form-control:focus {
+            border-color: #0a1f44;
+            box-shadow: 0 0 5px rgba(10,31,68,0.2);
+        }
+
+    .btn-custom {
+        background: #0a1f44;
+        color: white;
+        border-radius: 10px;
+        padding: 10px 25px;
+        border: none;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+        .btn-custom:hover {
+            background: #132f63;
+        }
+
+    .btn-back {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #0a1f44;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .btn-back:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card-custom">
+                <h2 class="title-custom">Edit Category</h2>
+
+                <form asp-action="Edit" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label>Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label>Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label>Status</label>
+                        <select asp-for="Status" class="form-control">
+                            <option value="1">Hiển thị</option>
+                            <option value="0">Ẩn</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger"></span>
+                    </div>
+
+                    <button class="btn-custom">Update</button>
+                </form>
+
+                <a asp-action="Index" class="btn-back">← Back to list Categories</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

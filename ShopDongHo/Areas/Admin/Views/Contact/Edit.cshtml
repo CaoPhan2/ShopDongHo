@@ -1,0 +1,176 @@
+﻿@using ShopDongHo.Models
+@model ContactModel
+
+@{
+    ViewData["Title"] = "Edit Contact";
+}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="page-header mb-4">
+        <h2>Update Contact</h2>
+        <p class="text-muted">Chỉnh sửa thông tin liên hệ website</p>
+    </div>
+
+    <!-- FORM -->
+    <div class="card custom-card">
+        <div class="card-body">
+
+            <form asp-action="Edit" asp-controller="Contact" enctype="multipart/form-data">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <!-- ROW 1 -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Name</label>
+                        <input asp-for="Name" class="form-control custom-input" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Email</label>
+                        <input asp-for="Email" class="form-control custom-input" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Phone</label>
+                        <input asp-for="Phone" class="form-control custom-input" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Logo</label>
+                        <input asp-for="ImageUpload" type="file" class="form-control custom-input" />
+
+                        <div class="mt-2">
+                            <img src="~/media/products/@Model.LogoImg"
+                                 id="imgpreview"
+                                 class="img-preview" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="form-group mb-3">
+                    <label>Description</label>
+                    <textarea asp-for="Description" class="form-control custom-input"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- MAP -->
+                <div class="form-group mb-3">
+                    <label>Map (iframe)</label>
+                    <textarea asp-for="Map" class="form-control custom-input"></textarea>
+                    <span asp-validation-for="Map" class="text-danger"></span>
+
+                    <!-- PREVIEW MAP -->
+                    <div class="map-preview mt-3">
+                        @Html.Raw(Model.Map)
+                    </div>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="Index" class="back-link">
+                        ← Back
+                    </a>
+
+                    <button class="btn btn-navy">
+                        Update
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <!-- CKEDITOR -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('Description');
+        CKEDITOR.replace('Map');
+    </script>
+
+    <!-- IMAGE PREVIEW -->
+    <script>
+        $("#ImageUpload").change(function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#imgpreview").attr("src", e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}
+<style>
+    /* CARD */
+    .custom-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    /* INPUT */
+    .custom-input {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #dcdfe6;
+    }
+
+        .custom-input:focus {
+            border-color: #0b1f3a;
+            box-shadow: 0 0 0 2px rgba(11,31,58,0.1);
+        }
+
+    /* BUTTON */
+    .btn-navy {
+        background: #0b1f3a;
+        color: white;
+        border-radius: 8px;
+        padding: 10px 20px;
+        border: none;
+    }
+
+        .btn-navy:hover {
+            background: #132c52;
+        }
+
+    /* IMAGE */
+    .img-preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+
+    /* MAP */
+    .map-preview iframe {
+        width: 100%;
+        height: 200px;
+        border-radius: 8px;
+    }
+
+    /* BACK LINK */
+    .back-link {
+        color: #0b1f3a;
+        text-decoration: none;
+    }
+</style>
