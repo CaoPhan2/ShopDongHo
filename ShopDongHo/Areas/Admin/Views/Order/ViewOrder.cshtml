@@ -78,11 +78,16 @@
             <strong>@ViewBag.ShippingCost.ToString("#,##0") đ</strong>
         </div>
 
+        @if ((decimal)ViewBag.Discount > 0)
+        {
+            <div class="od-box">
+                <span>Giảm giá</span>
+                <strong class="text text-warning">-@(((decimal)ViewBag.Discount).ToString("#,##0")) đ</strong>
+            </div>
+        }
         <div class="od-box total">
             <span>Thanh toán</span>
-            <strong>
-                @(total + (decimal)ViewBag.ShippingCost) đ
-            </strong>
+            <strong>@(((decimal)ViewBag.GrandTotal).ToString("#,##0")) đ</strong>
         </div>
 
         <!-- STATUS -->
@@ -107,11 +112,10 @@
 @section Scripts {
     <script>
         new DataTable('#order_detail', {
-            layout: {
-                topStart: {
-                    buttons: ['pdf','print']
-                }
-            }
+            lengthChange: false,
+            searching: false,
+            paging: false,
+            info: false
         });
     </script>
     <script>

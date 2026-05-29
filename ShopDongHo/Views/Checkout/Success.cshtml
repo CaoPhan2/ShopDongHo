@@ -1,8 +1,5 @@
-﻿@using ShopDongHo.Models.VNPay
-@model PaymentResponseModel
-@{
-    ViewData["Title"] = "Payment CallBack Vnpay";
-}
+﻿@model OrderModel
+
 <section class="success-section">
     <div class="container">
         <div class="checkout-header">
@@ -48,11 +45,12 @@
 
             <div class="order-code-box">
                 <span>MÃ ĐƠN HÀNG</span>
-                <h4>@Model.OrderId</h4>
+                <h4>@Model.OrderCode</h4>
             </div>
 
             <p class="mail-text">
-                Thông tin đơn hàng đã được gửi đến email của bạn
+                Thông tin đơn hàng đã được gửi đến email
+                <strong>@Model.UserName</strong>
             </p>
 
             <div class="success-actions">
@@ -63,7 +61,7 @@
                 </a>
 
                 <a asp-controller="Account"
-                   asp-action="ViewOrder" asp-route-ordercode="@Model.OrderId"
+                   asp-action="ViewOrder" asp-route-ordercode="@Model.OrderCode"
                    class="btn-outline">
                     XEM CHI TIẾT ĐƠN HÀNG
                 </a>

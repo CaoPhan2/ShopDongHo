@@ -7,7 +7,7 @@ using ShopDongHo.Models;
 namespace ShopDongHo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin, Publisher, Author")]
+    [Authorize(Roles = "Admin, Seller")]
     [Route("Admin/Order/")]
     public class OrderController : Controller
     {
@@ -30,7 +30,8 @@ namespace ShopDongHo.Areas.Admin.Controllers
             var Order = _dataContext.Orders.Where(s => s.OrderCode == ordercode).First();
             ViewBag.ShippingCost = Order.ShippingCost;
             ViewBag.Status = Order.Status;
-
+            ViewBag.Discount = Order.Discount;       
+            ViewBag.GrandTotal = Order.GrandTotal;
             return View(DetailsOrder);
         }
 

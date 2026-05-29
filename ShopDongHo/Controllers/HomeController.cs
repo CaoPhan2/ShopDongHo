@@ -90,7 +90,8 @@ namespace ShopDongHo.Controllers
             var reviews = _dataContext.Ratings.Where(x => x.Star >= 4).OrderByDescending(x => x.Star).Take(10).ToList();
             
             ViewBag.Reviews = reviews;
-
+            //Viewbag dùng dropmenu
+            ViewBag.Categories = _dataContext.Categories.ToList();
 
             return View(data);
         }
@@ -107,6 +108,9 @@ namespace ShopDongHo.Controllers
         public async Task<IActionResult> Wishlist()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null) 
+                return RedirectToAction("Login", "Account");
 
             var wishlist = await _dataContext.Wishlists
                 .Include(x => x.Product)

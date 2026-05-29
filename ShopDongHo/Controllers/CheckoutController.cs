@@ -1,12 +1,14 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ShopDongHo.Areas.Admin.Repository;
 using ShopDongHo.Models;
+using ShopDongHo.Models;
+using ShopDongHo.Models.ViewModel;
 using ShopDongHo.Repository;
 using ShopDongHo.Services.VnPay;
-using ShopDongHo.Models;
 using System.Security.Claims;
 
 namespace ShopDongHo.Controllers
@@ -16,17 +18,76 @@ namespace ShopDongHo.Controllers
         private readonly IVnPayService _vnPayService;
         private readonly DataContext _dataContext;
         private readonly IEmailSender _emailSender;
-        public CheckoutController(IEmailSender emailSender, DataContext context, IVnPayService vnPayService)
+        private readonly UserManager<AppUserModel> _UserManager;
+        public CheckoutController(IEmailSender emailSender, DataContext context, IVnPayService vnPayService, UserManager<AppUserModel> userManager)
         {
             _dataContext = context;
             _emailSender = emailSender;
             _vnPayService = vnPayService;
+            _UserManager = userManager;
         }
+
+        public async Task<IActionResult> Index()
+        {
+
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+            if (userEmail != null)
+            {
+                var user = await _UserManager.FindByEmailAsync(userEmail);
+                ViewBag.FullName = user?.FullName;
+                ViewBag.Phone = user?.PhoneNumber;
+                ViewBag.Address = user?.Address;
+            }
+
+            var cartItems = HttpContext.Session.GetJson<List<CartItemModel>>("Cart")
+                            ?? new List<CartItemModel>();
+
+            decimal subtotal = cartItems.Sum(x => x.Total);
+
+           
+
+            decimal discount = 0;
+
+            var couponCode = Request.Cookies["CouponCode"];
+
+            if (!string.IsNullOrEmpty(couponCode))
+            {
+                var coupon = _dataContext.Coupons
+                    .FirstOrDefault(x => x.Code == couponCode);
+
+                if (coupon != null)
+                {
+                    if (coupon.DiscountType == "percent")
+                    {
+                        discount = subtotal * coupon.DiscountPercent / 100m;
+                    }
+                    else
+                    {
+                        discount = coupon.DiscountAmount;
+                    }
+                }
+            }
+
+            var model = new CartItemViewModel
+            {
+                CartItems = cartItems,
+                GrandTotal = Math.Max(0, subtotal - discount)
+            };
+
+            ViewBag.SubTotal = subtotal;
+            ViewBag.Discount = discount;
+
+            return View(model);
+        }
+
         
+
+        [HttpPost]
         public async Task<IActionResult> Checkout(string PaymentMethod, string PaymentId)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if(userEmail == null)
+            if (userEmail == null)
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -63,10 +124,25 @@ namespace ShopDongHo.Controllers
                 _dataContext.Add(orderItem);
                 _dataContext.SaveChanges();
 
-
+                    
                 //taoj chi tieets donw hangf
                 List<CartItemModel> carts = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
-                foreach(var cart in carts)
+                // Đọc discount từ cookie
+                decimal discountAmount = 0;
+                var discountCookie = Request.Cookies["CouponValue"];
+                if (discountCookie != null)
+                    discountAmount = JsonConvert.DeserializeObject<decimal>(discountCookie);
+
+                decimal totalCartPrice = carts.Sum(c => c.Price * c.Quantity);
+
+                
+                // Lưu discount và grandtotal vào order
+                orderItem.Discount = discountAmount;
+                orderItem.GrandTotal = Math.Max(0, totalCartPrice + shippingPrice - discountAmount);
+                _dataContext.Update(orderItem);
+                await _dataContext.SaveChangesAsync();
+
+                foreach (var cart in carts)
                 {
                     var orderDetails = new OrderDetails();
                     orderDetails.UserName = userEmail;
@@ -80,10 +156,13 @@ namespace ShopDongHo.Controllers
                     product.Quantity -= cart.Quantity;
                     product.Sold += cart.Quantity;
                     _dataContext.Update(product);
-
                     _dataContext.Add(orderDetails);
                     _dataContext.SaveChanges();
                 }
+
+                // Discount và tổng tiền lưu ở OrderModel
+                orderItem.Discount = discountAmount;
+                orderItem.GrandTotal = Math.Max(0, carts.Sum(c => c.Price * c.Quantity) + shippingPrice - discountAmount);
 
                 // ===== THỐNG KÊ =====
 
@@ -145,8 +224,9 @@ namespace ShopDongHo.Controllers
                 var subject = "Đặt hàng thành công";
                 var message = "Cảm ơn bạn đã đặt hàng. Mã đơn hàng của bạn là: " + ordercode;
                 await _emailSender.SendEmailAsync(receiver, subject, message);
-                TempData["Success"] = "Đặt hàng thành công, vui lòng chờ duyệt đơn hàng";
-                return RedirectToAction("History", "Account");
+
+                return RedirectToAction("Success", "Checkout",new { ordercode = orderItem.OrderCode });
+    
 
             }
                 return View();
@@ -175,6 +255,21 @@ namespace ShopDongHo.Controllers
                 var PaymentMethod = response.PaymentMethod;
                 var PaymentId = response.PaymentId;
                 await Checkout(PaymentMethod, PaymentId);
+                // Sau khi Checkout() lưu xong, lấy ordercode mới nhất của user từ DB
+                var userEmail = User.FindFirstValue(ClaimTypes.Email);
+                var lastOrder = await _dataContext.Orders
+                    .Where(o => o.UserName == userEmail)
+                    .OrderByDescending(o => o.CreateDate)
+                    .FirstOrDefaultAsync();
+
+                if (lastOrder == null)
+                {
+                    TempData["Error"] = "Không tìm thấy đơn hàng";
+                    return RedirectToAction("Index", "Cart");
+                }
+
+                //Gán ordercode thật vào response để View dùng đúng
+                response.OrderId = lastOrder.OrderCode;
             }
             else
             {
@@ -182,6 +277,20 @@ namespace ShopDongHo.Controllers
                     return RedirectToAction("Index", "Cart");
             }
             return View(response);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Success(string ordercode)
+        {
+            var order = await _dataContext.Orders
+                .FirstOrDefaultAsync(o => o.OrderCode == ordercode);
+
+            if (order == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(order);
         }
     }
 }

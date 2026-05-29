@@ -9,7 +9,7 @@ using ShopDongHo.Repository;
 namespace ShopDongHo.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin, Publisher, Author")]
+    [Authorize(Roles = "Admin, Seller")]
     [Route("Admin/Category")]
     public class CategoryController : Controller
     {

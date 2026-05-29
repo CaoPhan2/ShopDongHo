@@ -51,7 +51,17 @@ namespace ShopDongHo.Controllers
                     }
                 }
             }
-
+            Response.Cookies.Append("CouponValue",
+              JsonConvert.SerializeObject(discount),
+              new CookieOptions
+              {
+                  HttpOnly = true,
+                  Secure = true,
+                  Expires = DateTimeOffset.UtcNow.AddMinutes(30),
+                  SameSite = SameSiteMode.Lax
+              });
+            ViewBag.SubTotal = subtotal;
+            ViewBag.Discount = discount;
             // Tính tổng tiền đơn hàng
             CartItemViewModel cartVM = new()
             {
@@ -60,14 +70,11 @@ namespace ShopDongHo.Controllers
                 CouponCode = coupon_code,
                 GrandTotal = Math.Max(0, subtotal + shippingPrice - discount) // tổng ko đc < 0
             };
+            ViewBag.GrandTotal = cartVM.GrandTotal;
             return View(cartVM);
         }
 
-        public IActionResult Checkout()
-        {
-            return View("~/Views/Checkout/Checkout.cshtml");
-        }
-
+        
         public async Task<IActionResult> AddToCart(long Id)
         {
             ProductModel product = await _dataContext.Products.FindAsync(Id);
@@ -233,7 +240,7 @@ namespace ShopDongHo.Controllers
                     HttpOnly = true,
                     Secure = true,
                     Expires = DateTimeOffset.UtcNow.AddMinutes(30),
-                    SameSite = SameSiteMode.Strict
+                    SameSite = SameSiteMode.Lax
                 };
                 Response.Cookies.Append("CouponCode", validCoupon.Code, cookieOptions);
                 Response.Cookies.Append("CouponTitle", couponTitle, cookieOptions);

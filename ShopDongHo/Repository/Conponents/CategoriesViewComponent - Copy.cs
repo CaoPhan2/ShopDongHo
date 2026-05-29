@@ -10,7 +10,10 @@ namespace ShopDongHo.Repository.Conponents
         {
             _datacontext = context;
         }
-        public async Task<IViewComponentResult> InvokeAsync()=>View(await _datacontext.Categories.ToListAsync());
-
+        public async Task<IViewComponentResult> InvokeAsync(string viewName = "Default")
+        {
+            var categories = await _datacontext.Categories.ToListAsync();
+            return View(viewName, categories);
+        }
     }
 }

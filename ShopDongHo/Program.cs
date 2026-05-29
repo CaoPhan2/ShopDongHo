@@ -71,7 +71,11 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddMemoryCache();
 
-
+//Connect Ollama 
+builder.Services.AddHttpClient("Ollama", client => {
+    client.BaseAddress = new Uri("http://localhost:11434");
+    client.Timeout = TimeSpan.FromSeconds(60);
+});
 
 var app = builder.Build();
 

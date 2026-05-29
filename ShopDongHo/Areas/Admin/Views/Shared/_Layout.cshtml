@@ -1,4 +1,17 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Identity.UserManager<ShopDongHo.Models.AppUserModel> UserManager
+@inject Microsoft.AspNetCore.Identity.SignInManager<ShopDongHo.Models.AppUserModel> SignInManager
+
+@{
+	ShopDongHo.Models.AppUserModel currentUser = null;
+	string userRole = "Seller";
+	if (SignInManager.IsSignedIn(User))
+	{
+		currentUser = await UserManager.GetUserAsync(User);
+		var roles = await UserManager.GetRolesAsync(currentUser);
+		userRole = roles.FirstOrDefault() ?? "Seller";
+	}
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="utf-8">
@@ -6,6 +19,7 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	<title>@ViewData["title"]-Admin Areas</title>
+
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
 		<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.min.css" rel="stylesheet">
 		<link href="https://cdn.datatables.net/buttons/3.2.6/css/buttons.dataTables.css" rel="stylesheet">
@@ -49,11 +63,18 @@
 			<i class="fa-regular fa-bell icon"></i>
 
 			<div class="user">
-				<img src="https://i.pravatar.cc/40" class="avatar" />
+				@if (!string.IsNullOrEmpty(currentUser?.Avatar))
+				{
+					<img src="~/media/avatars/@currentUser.Avatar" class="avatar" />
+				}
+				else
+				{
+					<img src="https://i.pravatar.cc/40" class="avatar" />
+				}
 
 				<div class="info">
-					<div class="name">Admin</div>
-					<div class="role">Quản trị viên</div>
+					<div class="name">@(currentUser?.FullName ?? currentUser?.UserName ?? "Admin")</div>
+					<div class="role">@userRole</div>
 				</div>
 
 				<div class="dropdown">

@@ -11,6 +11,8 @@
         public int Status { get; set; }
 
         public string PaymentMethod { get; set; }
+        public decimal Discount { get; set; }
+        public decimal GrandTotal { get; set; }
 
     }
 }

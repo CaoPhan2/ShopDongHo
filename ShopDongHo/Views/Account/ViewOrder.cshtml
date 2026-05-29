@@ -15,6 +15,12 @@
     <div class="od-header">
         <h1>Chi tiết đơn hàng</h1>
         <p>Mã đơn: <b>#@orderCode</b> <br /> Khách hàng: @userName</p>
+        <div class="od-info">
+            <h5>THÔNG TIN GIAO HÀNG</h5>
+            <p><i class="fa fa-user"></i> <b>Họ tên:</b> @ViewBag.FullName</p>
+            <p><i class="fa fa-phone"></i> <b>SĐT:</b> @ViewBag.Phone</p>
+            <p><i class="fa fa-map-marker"></i> <b>Địa chỉ:</b> @ViewBag.Address</p>
+        </div>
     </div>
 
     <!-- TABLE -->
@@ -78,13 +84,17 @@
             <strong>@ViewBag.ShippingCost.ToString("#,##0") đ</strong>
         </div>
 
+        @if ((decimal)ViewBag.Discount > 0)
+        {
+            <div class="od-box">
+                <span>Giảm giá</span>
+                <strong class="text text-warning">-@(((decimal)ViewBag.Discount).ToString("#,##0")) đ</strong>
+            </div>
+        }
         <div class="od-box total">
             <span>Thanh toán</span>
-            <strong>
-                @((total + (decimal)ViewBag.ShippingCost).ToString("N0")) đ
-            </strong>
+            <strong>@(((decimal)ViewBag.GrandTotal).ToString("#,##0")) đ</strong>
         </div>
-
         <!-- STATUS -->
         <div class="od-status">
             @if (ViewBag.Status ==1)
@@ -107,11 +117,10 @@
 @section Scripts {
     <script>
         new DataTable('#order_detail', {
-            layout: {
-                topStart: {
-                    buttons: ['pdf','print']
-                }
-            }
+            lengthChange: false,
+            searching: false,
+            paging: false,
+            info: false
         });
     </script>
     <script>
@@ -138,3 +147,6 @@
     </script>
 
 }
+<style>
+    
+</style>

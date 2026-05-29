@@ -1,60 +1,223 @@
 ﻿@using ShopDongHo.Models
 @model AppUserModel
 @{
-	ViewData["title"] = "Update Account Infor";
+    ViewData["title"] = "Cập nhật tài khoản";
 }
-<section>
-	<!--form-->
-	<div class="container">
-		<div class="row">
 
-			<div class="col-sm-8" col-sm-offset-1>
-				<div class="signup-form">
-					<!--sign up form-->
-					<h2>Update Account Information</h2>
+<section style="padding: 2rem 0; background: #f8f9fa; min-height: 80vh;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 0 15px;">
+        <form asp-action="UpdateInfoAccount" asp-controller="Account"
+              method="post" autocomplete="off" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="margin-bottom:12px;"></div>
 
-					<form autocomplete="off" asp-action="UpdateInfoAccount" asp-controller="Account" method="post">
-                        <input type="hidden" asp-for="Id" />
-						<div asp-validation-summary="ModelOnly" class="text-danger"></div>
-						<div class="form-group">
-							<labe>UserName</labe>
-							<input asp-for="UserName" readonly required class="form-control" />
-							<span asp-validation-for="UserName" class="text-danger"></span>
-						</div>
-						<div class="form-group">
-							<labe>Email</labe>
-							<input asp-for="Email" readonly required class="form-control" />
-							<span asp-validation-for="Email" class="text-danger"></span>
-						</div>
-						<div class="form-group">
-							<labe>Phone Number</labe>
-							<input asp-for="PhoneNumber" required class="form-control" />
-							<span asp-validation-for="PhoneNumber" class="text-danger"></span>
-						</div>
-						<div class="form-group">
-							<labe>Old Password</labe>
-							<input type="text" readonly value="@Model.PasswordHash" class="form-control" />
-							
-						</div>
-						<div class="form-group">
-							<labe>New Password</labe>
-							<input type="text" name="PasswordHash" required class="form-control" />
-							<span asp-validation-for="PasswordHash" class="text-danger"></span>
-						</div>
-						<div class="form-group">
-							<button class="btn btn-default">Update</button>
-						</div>
-						
-					</form>
+            <!-- AVATAR -->
+            <div class="avatar-wrapper">
+                <div class="avatar-circle" onclick="document.getElementById('avatarInput').click()">
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <img id="avatarPreview" src="~/media/avatars/@Model.Avatar" />
+                    }
+                    else
+                    {
+                        <i class="fa fa-user" id="avatarIcon" style="font-size:36px;color:#fff;"></i>
+                        <img id="avatarPreview" src="" style="display:none;" />
+                    }
+                    <div class="avatar-overlay">
+                        <i class="fa fa-camera"></i>
+                    </div>
+                </div>
+                <input type="file" id="avatarInput" name="avatarFile"
+                       accept="image/*" style="display:none;"
+                       onchange="previewAvatar(this)" />
+                <h4 class="avatar-name">@Model.FullName</h4>
+                <p class="avatar-email">@Model.Email</p>
+            </div>
 
-					
-				</div><!--/sign up form-->
-			</div>
-		</div>
-	</div>
-</section><!--/form-->
+            @* THÔNG TIN CƠ BẢN *@
+            <div class="account-card">
+                <div class="card-section-title">Thông tin cơ bản</div>
+
+                <div class="account-row">
+                    <i class="fa fa-user-circle account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Tên đăng nhập</p>
+                        <input asp-for="UserName" readonly class="field-input" />
+                    </div>
+                    <span class="badge-readonly">Không thể sửa</span>
+                </div>
+
+                <div class="account-row">
+                    <i class="fa fa-envelope account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Email</p>
+                        <input asp-for="Email" readonly class="field-input" />
+                    </div>
+                    <span class="badge-readonly">Không thể sửa</span>
+                </div>
+
+                <div class="account-row" id="row-phone">
+                    <i class="fa fa-phone account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Số điện thoại</p>
+                        <input asp-for="PhoneNumber" id="inp-phone" readonly class="field-input" placeholder="Nhập số điện thoại" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('phone')" id="btn-phone" class="btn-edit">
+                        <i id="icon-phone" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+            @* THÔNG TIN CÁ NHÂN *@
+            <div class="account-card" style="margin-top:12px;">
+                <div class="card-section-title">Thông tin cá nhân</div>
+
+                <div class="account-row" id="row-fullname">
+                    <i class="fa fa-id-card account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Họ và tên</p>
+                        <input asp-for="FullName" id="inp-fullname" readonly class="field-input" placeholder="Nhập họ và tên" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('fullname')" id="btn-fullname" class="btn-edit">
+                        <i id="icon-fullname" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+
+                <div class="account-row" id="row-birthday">
+                    <i class="fa fa-calendar account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Ngày sinh</p>
+                        <input asp-for="BirthDay" id="inp-birthday" readonly class="field-input" type="date" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('birthday')" id="btn-birthday" class="btn-edit">
+                        <i id="icon-birthday" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+
+                <div class="account-row" id="row-gender">
+                    <i class="fa fa-venus-mars account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Giới tính</p>
+                        <select asp-for="Gender" id="inp-gender" disabled class="field-input">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <button type="button" onclick="toggleEdit('gender')" id="btn-gender" class="btn-edit">
+                        <i id="icon-gender" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+
+                <div class="account-row" id="row-address">
+                    <i class="fa fa-map-marker account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Địa chỉ</p>
+                        <input asp-for="Address" id="inp-address" readonly class="field-input" placeholder="Nhập địa chỉ" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('address')" id="btn-address" class="btn-edit">
+                        <i id="icon-address" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+            @* ĐỔI MẬT KHẨU *@
+            <div class="account-card" style="margin-top:12px;">
+                <div class="card-section-title">Đổi mật khẩu</div>
+
+                <div class="account-row" id="row-oldpw">
+                    <i class="fa fa-lock account-icon"></i>
+                    <div class="account-field">
+                        <p class="field-label">Mật khẩu hiện tại</p>
+                        <input type="password" name="OldPassword" id="inp-oldpw" readonly class="field-input" placeholder="••••••••" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('oldpw')" id="btn-oldpw" class="btn-edit">
+                        <i id="icon-oldpw" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+
+                <div class="account-row" id="row-newpw">
+                    <i class="fa fa-lock account-icon" style="color:#1D9E75;"></i>
+                    <div class="account-field">
+                        <p class="field-label">Mật khẩu mới</p>
+                        <input type="password" asp-for="PasswordHash" id="inp-newpw" readonly class="field-input" placeholder="••••••••" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('newpw')" id="btn-newpw" class="btn-edit">
+                        <i id="icon-newpw" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+
+                <div class="account-row" id="row-confirmpw">
+                    <i class="fa fa-check-circle account-icon" style="color:#1D9E75;"></i>
+                    <div class="account-field">
+                        <p class="field-label">Xác nhận mật khẩu mới</p>
+                        <input type="password" name="ConfirmPassword" id="inp-confirmpw" readonly class="field-input" placeholder="••••••••" />
+                    </div>
+                    <button type="button" onclick="toggleEdit('confirmpw')" id="btn-confirmpw" class="btn-edit">
+                        <i id="icon-confirmpw" class="fa fa-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button type="submit" class="btn-save">
+                    <i class="fa fa-floppy-o"></i> Lưu thay đổi
+                </button>
+                <a asp-controller="Home" asp-action="Index" class="btn-cancel">Hủy</a>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+<style>
+    
+</style>
+
 @section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Preview avatar trước khi upload
+        function previewAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('avatarPreview');
+                    const icon = document.getElementById('avatarIcon');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    if (icon) icon.style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Toggle edit
+        const editState = {};
+        function toggleEdit(field) {
+            const inp = document.getElementById('inp-' + field);
+            const icon = document.getElementById('icon-' + field);
+            const btn = document.getElementById('btn-' + field);
+            const row = document.getElementById('row-' + field);
+            editState[field] = !editState[field];
+
+            if (editState[field]) {
+                if (inp.tagName === 'SELECT') inp.removeAttribute('disabled');
+                else inp.removeAttribute('readonly');
+                inp.focus();
+                icon.className = 'fa fa-check';
+                btn.classList.add('active');
+                row.classList.add('editing');
+            } else {
+                if (inp.tagName === 'SELECT') inp.setAttribute('disabled', true);
+                else inp.setAttribute('readonly', true);
+                icon.className = 'fa fa-pencil';
+                btn.classList.remove('active');
+                row.classList.remove('editing');
+            }
+        }
+    </script>
 }

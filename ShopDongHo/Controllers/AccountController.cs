@@ -102,27 +102,54 @@ namespace ShopDongHo.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateInfoAccount(AppUserModel user)
+        public async Task<IActionResult> UpdateInfoAccount(AppUserModel user, IFormFile avatarFile)
         {
-          
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            //get user by email
             var userById = await _userManage.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if(userById == null)
+
+            if (userById == null) return NotFound();
+            //  Upload avatar
+            if (avatarFile != null && avatarFile.Length > 0)
             {
-                return NotFound();
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "media", "avatars");
+                Directory.CreateDirectory(uploadsFolder); // Tạo folder nếu chưa có
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await avatarFile.CopyToAsync(stream);
+                }
+
+                // Xóa ảnh cũ nếu có
+                if (!string.IsNullOrEmpty(userById.Avatar))
+                {
+                    var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "media", "avatars", userById.Avatar);
+                    if (System.IO.File.Exists(oldPath))
+                        System.IO.File.Delete(oldPath);
+                }
+
+                userById.Avatar = fileName;
             }
-            else
+            // Cập nhật thông tin cá nhân
+            userById.PhoneNumber = user.PhoneNumber;
+            userById.FullName = user.FullName;
+            userById.BirthDay = user.BirthDay;
+            userById.Gender = user.Gender;
+            userById.Address = user.Address;
+
+            //  Đổi mật khẩu nếu có nhập
+            if (!string.IsNullOrEmpty(user.PasswordHash))
             {
                 var passwordHasher = new PasswordHasher<AppUserModel>();
-                var passwordHash = passwordHasher.HashPassword(userById, user.PasswordHash);
-
-                userById.PasswordHash = passwordHash;
-                _dataContext.Update(userById);
-                await _dataContext.SaveChangesAsync();
-                TempData["success"] = "Cập nhật thông tin tài khoản thành công";
+                userById.PasswordHash = passwordHasher.HashPassword(userById, user.PasswordHash);
             }
+
+            _dataContext.Update(userById);
+            await _dataContext.SaveChangesAsync();
+            TempData["success"] = "Cập nhật thông tin tài khoản thành công";
+
             return RedirectToAction("UpdateAccount", "Account");
         }
 
@@ -171,7 +198,17 @@ namespace ShopDongHo.Controllers
             var Order = _dataContext.Orders.Where(s => s.OrderCode == ordercode).First();
             ViewBag.ShippingCost = Order.ShippingCost;
             ViewBag.Status = Order.Status;
+            ViewBag.Discount = Order.Discount;       
+            ViewBag.GrandTotal = Order.GrandTotal;
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
 
+            if (userEmail != null)
+            {
+                var user = await _userManage.FindByEmailAsync(userEmail);
+                ViewBag.FullName = user?.FullName;
+                ViewBag.Phone = user?.PhoneNumber;
+                ViewBag.Address = user?.Address;
+            }
             return View(DetailsOrder);
         }
         public async Task<IActionResult> CancelOrder(string ordercode)

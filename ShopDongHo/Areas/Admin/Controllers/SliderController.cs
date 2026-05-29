@@ -10,7 +10,7 @@ namespace ShopDongHo.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/Slider")]
-    [Authorize(Roles = "Admin, Pulisher, Author")]
+    [Authorize(Roles = "Admin, Seller")]
     public class SliderController : Controller
     {
         private readonly DataContext _dataContext;

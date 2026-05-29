@@ -1,0 +1,727 @@
+﻿
+
+/*=====================
+=========History Order========*/
+
+/* HEADER */
+.order-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0b1f3a;
+    margin-bottom: 5px;
+}
+
+.order-header p {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* CARD */
+.order-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.order-table thead {
+    background: #0b1f3a;
+    color: #fff;
+}
+
+    .order-table thead th {
+        border: none;
+        font-weight: 500;
+        padding: 12px;
+    }
+
+.order-table tbody tr {
+    transition: 0.3s;
+}
+
+    .order-table tbody tr:hover {
+        background: #f8f9fc;
+    }
+
+/* ORDER CODE */
+.order-code {
+    font-weight: 500;
+    color: #0b1f3a;
+}
+
+/* BADGE */
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* PAYMENT */
+.badge-cod {
+    background: #ffe5e5;
+    color: #dc3545;
+}
+
+.badge-online {
+    background: #e6f0ff;
+    color: #1a73e8;
+}
+
+/* STATUS */
+.badge-new {
+    background: #e7f5ff;
+    color: #0d6efd;
+}
+
+.badge-done {
+    background: #e6f7ee;
+    color: #28a745;
+}
+
+.badge-cancel {
+    background: #fdeaea;
+    color: #dc3545;
+}
+
+/* BUTTON CANCEL */
+/* ACTION */
+.o-action {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-view {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #0b1f3a;
+    color: #fff;
+    text-decoration: none;
+}
+
+    .btn-view:hover {
+        background: #142f55;
+    }
+
+.btn-delete {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+    text-decoration: none;
+}
+
+    .btn-delete:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+
+/*============================
+==========View Order Detail=========*/
+
+.order-detail-container {
+    padding: 25px;
+    background: #f7f9fc;
+}
+
+/* HEADER */
+.od-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0b1f3a;
+}
+
+.od-header p {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* CARD */
+.od-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.od-table thead {
+    background: #0b1f3a;
+    color: #fff;
+}
+
+.od-table th {
+    border: none;
+    padding: 12px;
+}
+
+.od-table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+/* PRODUCT */
+.od-product {
+    font-weight: 500;
+    color: #0b1f3a;
+}
+
+/* SUBTOTAL */
+.od-subtotal {
+    font-weight: 500;
+    color: #0b1f3a;
+}
+
+/* SUMMARY */
+.od-summary {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.od-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+    .od-box span {
+        display: block;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .od-box strong {
+        font-size: 18px;
+        color: #0b1f3a;
+    }
+
+    .od-box.total {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+        .od-box.total strong {
+            color: #fff;
+        }
+
+/* STATUS */
+.od-status {
+    display: flex;
+    align-items: center;
+}
+
+.od-select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* BADGE */
+.badge-cancel {
+    background: #fdeaea;
+    color: #dc3545;
+    padding: 6px 10px;
+    border-radius: 20px;
+}
+
+.od-info {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+    .od-info h5 {
+        font-weight: 600;
+        color: #0b1f3a;
+        margin-bottom: 10px;
+    }
+
+    .od-info p {
+        margin: 5px 0;
+        color: #444;
+    }
+
+    .od-info i {
+        width: 20px;
+        color: #0b1f3a;
+    }
+
+
+
+/*    =======================
+    ========= thông tin user============*/
+.justify-content-center {
+    justify-content: center;
+}
+
+/* AVATAR */
+.avatar-wrapper {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, #0b1f3a, #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+}
+
+    .avatar-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-circle .avatar-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity .2s;
+        border-radius: 50%;
+    }
+
+        .avatar-circle .avatar-overlay i {
+            color: #fff;
+            font-size: 22px;
+        }
+
+    .avatar-circle:hover .avatar-overlay {
+        opacity: 1;
+    }
+
+.avatar-name {
+    margin: 0;
+    font-weight: 600;
+    color: #0b1f3a;
+    font-size: 18px;
+}
+
+.avatar-email {
+    color: #aaa;
+    font-size: 13px;
+    margin: 2px 0 0;
+}
+
+/* CARD */
+.account-card {
+    background: #fff;
+    border: 0.5px solid #e5e5e5;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-section-title {
+    padding: 11px 20px;
+    background: #f8f9fa;
+    border-bottom: 0.5px solid #e5e5e5;
+    font-size: 11px;
+    font-weight: 500;
+    color: #888;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.account-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 20px;
+    border-bottom: 0.5px solid #f0f0f0;
+    transition: background .2s;
+}
+
+    .account-row:last-child {
+        border-bottom: none;
+    }
+
+.account-icon {
+    font-size: 18px;
+    color: #aaa;
+    min-width: 20px;
+    text-align: center;
+}
+
+.account-field {
+    flex: 1;
+}
+
+.field-label {
+    margin: 0 0 2px;
+    font-size: 11px;
+    color: #999;
+}
+
+.field-input {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #222;
+    width: 100%;
+    outline: none;
+    cursor: default;
+    transition: border-bottom .2s;
+    font-family: inherit;
+}
+
+    .field-input:not([readonly]):not([disabled]) {
+        cursor: text;
+        border-bottom: 1.5px solid #1D9E75;
+        padding-bottom: 2px;
+    }
+
+select.field-input:disabled {
+    opacity: 1;
+    -webkit-appearance: none;
+}
+
+.badge-readonly {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: #f5f5f5;
+    color: #aaa;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+.btn-edit {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    transition: color .2s, background .2s;
+}
+
+    .btn-edit:hover {
+        background: #f5f5f5;
+        color: #555;
+    }
+
+    .btn-edit.active {
+        color: #1D9E75;
+    }
+
+.account-row.editing {
+    background: #f0faf6;
+}
+
+.btn-save {
+    flex: 1;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 500;
+    background: #0b1f3a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+    .btn-save:hover {
+        background: #142f55;
+    }
+
+.btn-cancel {
+    padding: 11px 20px;
+    font-size: 14px;
+    color: #888;
+    border: 0.5px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background .2s;
+}
+
+    .btn-cancel:hover {
+        background: #f5f5f5;
+        color: #555;
+    }
+
+
+/*========================
+==========Login ============*/
+
+
+.login-section {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f5f5;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 380px;
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+    .login-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    height: 42px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+}
+
+.btn-login {
+    width: 100%;
+    background: #0b1f3a;
+    color: #fff;
+    border: none;
+    height: 42px;
+    border-radius: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+    .btn-login:hover {
+        background: #222;
+    }
+
+.btn-google {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #333;
+    text-decoration: none;
+}
+
+.extra-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+    .extra-links a {
+        font-size: 13px;
+        color: #555;
+        text-decoration: none;
+    }
+
+
+/*	============View Order ==========*/
+
+.order-detail-container {
+    padding: 25px;
+    background: #f7f9fc;
+}
+
+/* HEADER */
+.od-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0b1f3a;
+}
+
+.od-header p {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* CARD */
+.od-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+/* TABLE */
+.od-table thead {
+    background: #0b1f3a;
+    color: #fff;
+}
+
+.od-table th {
+    border: none;
+    padding: 12px;
+}
+
+.od-table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+/* PRODUCT */
+.od-product {
+    font-weight: 500;
+    color: #0b1f3a;
+}
+
+/* SUBTOTAL */
+.od-subtotal {
+    font-weight: 500;
+    color: #0b1f3a;
+}
+
+/* SUMMARY */
+.od-summary {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.od-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+    .od-box span {
+        display: block;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .od-box strong {
+        font-size: 18px;
+        color: #0b1f3a;
+    }
+
+    .od-box.total {
+        background: #0b1f3a;
+        color: #fff;
+    }
+
+        .od-box.total strong {
+            color: #fff;
+        }
+
+/* STATUS */
+.od-status {
+    display: flex;
+    align-items: center;
+}
+
+.od-select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* BADGE */
+.badge-cancel {
+    background: #fdeaea;
+    color: #dc3545;
+    padding: 6px 10px;
+    border-radius: 20px;
+}
+
+.linkback {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+
+/*==============Create Account =============
+=========================================*/
+.register-section {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f5f5;
+}
+
+.register-box {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+    .register-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    height: 42px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    padding: 0 10px;
+}
+
+.btn-register {
+    width: 100%;
+    background: #0b1f3a;
+    color: #fff;
+    border: none;
+    height: 42px;
+    border-radius: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+    .btn-register:hover {
+        background: #222;
+    }
+
+.extra-links {
+    margin-top: 15px;
+    text-align: center;
+}
+
+    .extra-links a {
+        font-size: 14px;
+        color: #555;
+        text-decoration: none;
+    }

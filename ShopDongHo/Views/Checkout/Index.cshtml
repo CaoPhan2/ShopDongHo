@@ -1,0 +1,261 @@
+﻿@model CartItemViewModel
+
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<section class="checkout-page">
+
+    <div class="container">
+
+        <div class="checkout-header">
+
+            <h1>THANH TOÁN</h1>
+
+            <div class="checkout-steps">
+
+                <div class="step active">1</div>
+                <div class="step-line active"></div>
+
+                <div class="step active">2</div>
+                <div class="step-line"></div>
+
+                <div class="step">3</div>
+
+
+            </div>
+
+            <div class="step-labels">
+                <span>Giỏ hàng</span>
+                <span>Thanh toán</span>
+                <span>Hoàn tất</span>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <!-- LEFT -->
+            <div class="col-lg-8">
+
+                <div class="checkout-card">
+
+                    <h5>THÔNG TIN GIAO HÀNG</h5>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label>Họ và tên</label>
+                            <input type="text" class="form-control"
+                                   value="@ViewBag.FullName"
+                                   placeholder="Nhập họ tên">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Số điện thoại</label>
+                            <input type="text" class="form-control"
+                                   value="@ViewBag.Phone"
+                                   placeholder="Nhập số điện thoại">
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label>Địa chỉ nhận hàng</label>
+                            <input type="text" class="form-control"
+                                   value="@ViewBag.Address"
+                                   placeholder="Nhập địa chỉ">
+                        </div>
+
+                        
+
+                    </div>
+
+                </div>
+
+                <div class="checkout-card">
+
+                    <h5>PHƯƠNG THỨC GIAO HÀNG</h5>
+
+                    <label class="option-box">
+
+                        <input type="radio" checked name="shipping" value="0">
+                               
+                               
+
+                        <div class="option-content">
+                            <strong>Giao hàng tiêu chuẩn</strong>
+                            <p>Nhận hàng trong 2 - 4 ngày</p>
+                        </div>
+
+                        <span class="price-tag">Miễn phí</span>
+
+                    </label>
+
+                    <label class="option-box">
+
+                        <input type="radio" name="shipping" value="50000">
+                              
+
+                        <div class="option-content">
+                            <strong>Giao hàng nhanh</strong>
+                            <p>Nhận hàng trong 24h</p>
+                        </div>
+
+                        <span class="price-tag">50.000đ</span>
+
+                    </label>
+
+                </div>
+
+                <div class="checkout-card">
+
+                    <h5>PHƯƠNG THỨC THANH TOÁN</h5>
+
+                  
+
+                    <!-- PAYMENT -->
+                    <div class="cs-payment">
+                       
+                        <form method="POST" asp-action="Checkout" asp-controller="Checkout">
+                            <input type="hidden" name="PaymentMethod" value="COD" />
+                            <input type="hidden" name="PaymentId" value="" />
+                            <button type="submit" class="btn-main"
+                                    onclick="return confirm('Xác nhận đặt hàng?')">
+                                Thanh toán khi nhận hàng (COD)
+                            </button>
+                        </form>
+                        <form method="POST" asp-action="CreatePaymentUrlVnpay" asp-controller="Payment">
+                            <input type="hidden" name="Amount" value="@Model.GrandTotal" />
+                            <input type="hidden" name="OrderType" value="other" />
+                            <input type="hidden" name="OrderDescription" value="Thanh toán VnPay" />
+                            <input type="hidden" name="Name" value="@User.Identity.Name" />
+
+                            <button type="submit" class="btn-vnpay">VNPay</button>
+                        </form>
+                        <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payment">
+                            <input type="hidden" name="Amount" value="@Model.GrandTotal" />
+                            <input type="hidden" name="OrderId" value="@Guid.NewGuid().ToString()" />
+                            <input type="hidden" name="OrderInfo" value="Thanh toán Momo" />
+                            <input type="hidden" name="FullName" value="@User.Identity.Name" />
+
+                            <button type="submit" class="btn-momo">MoMo</button>
+                        </form>
+
+                        
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+            <div class="col-lg-4">
+
+                <div class="order-summary">
+
+                    <h5>ĐƠN HÀNG CỦA BẠN</h5>
+
+                    @if (Model?.CartItems != null && Model.CartItems.Any())
+                    {
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <div class="product-itemss">
+
+                                <img src="~/media/products/@item.Image"
+                                     alt="@item.ProductName">
+
+                                <div class="product-infor">
+
+                                    <h6>@item.ProductName</h6>
+
+                                    <small>
+                                        Số lượng: @item.Quantity
+                                    </small>
+
+                                </div>
+
+                                <div class="product-price">
+                                    @item.Total.ToString("#,##0")đ
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+                    <hr>
+                    <div class="summary-row text-success">
+                        <span>Giảm giá</span>
+                        <span>-@(((decimal)ViewBag.Discount).ToString("#,##0"))đ</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tạm tính</span>
+                        <span>@Model.GrandTotal.ToString("#,##0")đ</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Phí vận chuyển</span>
+                        <span id="shippingCost">0đ</span>
+                    </div>
+                    
+                    <hr>
+
+                    <div class="summary-row total">
+                        <span>TỔNG CỘNG</span>
+                        <span id="grandTotal">
+                            @Model.GrandTotal.ToString("#,##0")đ
+                        </span>
+                    </div>
+                   
+                </div>
+                    
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+@section Scripts {
+    <script>
+                document.addEventListener("DOMContentLoaded", function () {
+            const shippingRadios = document.querySelectorAll('input[name="shipping"]');
+            const shippingCostSpan = document.getElementById("shippingCost");
+            const grandTotalSpan = document.getElementById("grandTotal");
+
+            let subtotal = @Model.GrandTotal.ToString("0");
+
+            function updateTotal(shippingCost) {
+                // Cập nhật hiển thị
+                shippingCostSpan.innerText = shippingCost === 0
+                    ? "Miễn phí"
+                    : shippingCost.toLocaleString('vi-VN') + "đ";
+
+                let grandTotal = subtotal + shippingCost;
+                grandTotalSpan.innerText = grandTotal.toLocaleString('vi-VN') + "đ";
+
+                //  Cập nhật hidden input của VNPAY và MoMo
+                document.querySelectorAll('input[name="Amount"]').forEach(function(input) {
+                    input.value = grandTotal;
+                });
+
+                //  Lưu ShippingPrice vào cookie
+                document.cookie = "ShippingPrice=" + JSON.stringify(shippingCost)
+                    + "; path=/; max-age=1800";
+            }
+
+            shippingRadios.forEach(radio => {
+                radio.addEventListener("change", function () {
+                    updateTotal(parseInt(this.value));
+                });
+            });
+
+            const checkedRadio = document.querySelector('input[name="shipping"]:checked');
+            if (checkedRadio) updateTotal(parseInt(checkedRadio.value));
+        });
+    </script>
+
+    
+}
+<style>
+    
+</style>

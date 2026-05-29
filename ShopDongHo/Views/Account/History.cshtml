@@ -11,6 +11,7 @@
     <div class="order-header">
         <h1>Lịch sử mua hàng</h1>
         <p>Khách hàng: @ViewBag.UserEmail</p>
+
     </div>
 
     <!-- TABLE CARD -->
@@ -111,120 +112,18 @@
     </div>
 
 </div>
+@section Scripts {
+    <script>
+        let table = new DataTable('#myTable', {
+            paging: true,
+             lengthChange: false,
+            searching: false,
+            ordering: false,
+            info: false
 
+        });
+    </script>
+}
 <style>
-    /* HEADER */
-    .order-header h1 {
-        font-size: 24px;
-        font-weight: 600;
-        color: #0b1f3a;
-        margin-bottom: 5px;
-    }
-
-    .order-header p {
-        font-size: 14px;
-        color: #6c757d;
-    }
-
-    /* CARD */
-    .order-card {
-        background: #fff;
-        border-radius: 14px;
-        padding: 20px;
-        margin-top: 20px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-    }
-
-    /* TABLE */
-    .order-table thead {
-        background: #0b1f3a;
-        color: #fff;
-    }
-
-        .order-table thead th {
-            border: none;
-            font-weight: 500;
-            padding: 12px;
-        }
-
-    .order-table tbody tr {
-        transition: 0.3s;
-    }
-
-        .order-table tbody tr:hover {
-            background: #f8f9fc;
-        }
-
-    /* ORDER CODE */
-    .order-code {
-        font-weight: 500;
-        color: #0b1f3a;
-    }
-
-    /* BADGE */
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-    }
-
-    /* PAYMENT */
-    .badge-cod {
-        background: #ffe5e5;
-        color: #dc3545;
-    }
-
-    .badge-online {
-        background: #e6f0ff;
-        color: #1a73e8;
-    }
-
-    /* STATUS */
-    .badge-new {
-        background: #e7f5ff;
-        color: #0d6efd;
-    }
-
-    .badge-done {
-        background: #e6f7ee;
-        color: #28a745;
-    }
-
-    .badge-cancel {
-        background: #fdeaea;
-        color: #dc3545;
-    }
-
-    /* BUTTON CANCEL */
-    /* ACTION */
-    .o-action {
-        display: flex;
-        gap: 8px;
-    }
-
-    .btn-view {
-        padding: 5px 10px;
-        border-radius: 8px;
-        background: #0b1f3a;
-        color: #fff;
-        text-decoration: none;
-    }
-
-        .btn-view:hover {
-            background: #142f55;
-        }
-
-    .btn-delete {
-        padding: 5px 10px;
-        border-radius: 8px;
-        border: 1px solid #dc3545;
-        color: #dc3545;
-        text-decoration: none;
-    }
-
-        .btn-delete:hover {
-            background: #dc3545;
-            color: #fff;
-        }
+   
 </style>

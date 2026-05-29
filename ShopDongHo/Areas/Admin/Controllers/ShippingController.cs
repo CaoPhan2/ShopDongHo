@@ -8,7 +8,7 @@ namespace ShopDongHo.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/Shipping")]
-    [Authorize(Roles = "Admin, Publisher, Author")]
+    [Authorize(Roles = "Admin, Seller")]
     public class ShippingController : Controller
     {
         private readonly DataContext _dataContext;

@@ -14,6 +14,12 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.dataTables.min.css">
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css">
+		<script src="https://cdn.datatables.net/1.13.8/js/dataTables.min.js"></script>
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+			  
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
 	<link href="~/css/animate.css" rel="stylesheet">
@@ -21,6 +27,8 @@
 	<link href="~/css/responsive.css" rel="stylesheet">
 	<link href="~/css/lg.css" rel="stylesheet">
 	<link href="~/css/product.css" rel="stylesheet">
+	<link href="~/css/cart.css" rel="stylesheet">
+	<link href="~/css/account.css" rel="stylesheet">
 	<!--[if lt IE 9]>
 	<script src="~/js/html5shiv.js"></script>
 	<script src="~/js/respond.min.js"></script>
@@ -54,6 +62,8 @@
 			<!-- MENU -->
 			<nav class="nav-menu">
 				<a asp-controller="Home" asp-action="Index">Trang Chủ</a>
+				@await Component.InvokeAsync("Categories", new { viewName = "NavMenu" })
+				@await Component.InvokeAsync("Brands", new { viewName = "NavMenu" })
 				<a asp-controller="Home" asp-action="Wishlist">Yêu Thích</a>
 				<a asp-controller="Home" asp-action="AboutUs">Về Chúng Tôi</a>
 				<a asp-controller="Home" asp-action="Contact">Liên hệ</a>
@@ -66,7 +76,9 @@
 					<button type="submit"><i class="fa fa-search"></i></button>
 				</form>
 
-				<a asp-controller="Cart" asp-action="Index"> <i class="fa fa-shopping-cart" style="font-size: 24px"></i></a>
+				<a asp-controller="Cart" asp-action="Index" title="Giỏ hàng"> 
+					<i class="fa fa-shopping-cart" style="font-size: 24px"></i>
+				</a>
 				@if (User.Identity?.IsAuthenticated ?? false)
 				{
 					<div class="dropdown">
@@ -432,6 +444,7 @@
 		});
 
 	</script>
+	
 	@await RenderSectionAsync("Scripts", required: false)
 
 </body>
@@ -876,6 +889,14 @@
 		overflow-y: auto;
 		background: #f8fafc;
 	}
+	.chat-body .text {
+		display: block;
+		padding: 10px;
+		background: #e2e8f0;
+		border-radius: 10px;
+		margin-bottom: 10px;
+	}
+
 
 	/* FOOTER */
 
@@ -917,6 +938,7 @@
 		border-radius: 10px;
 		margin-bottom: 10px;
 	}
+	
 	
 </style>
 
