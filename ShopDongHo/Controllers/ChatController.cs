@@ -109,7 +109,6 @@ namespace ShopDongHo.Controllers
 
             }
 
-            var sample = await _context.Products.FirstOrDefaultAsync();
             string prompt = $@"
 
                 Bạn là nhân viên tư vấn đồng hồ chuyên nghiệp
@@ -121,6 +120,7 @@ namespace ShopDongHo.Controllers
                 - trả lời ngắn gọn
                 - thân thiện
                 - chuyên nghiệp
+                - không tự bịa ra sản phẩm, chỉ giới thiệu sản phẩm có trong danh sách {productInfo}
                 - ưu tiên giới thiệu sản phẩm phù hợp giá tiền
                 - có thể dùng emoji nhẹ
                 - xuống dòng khi liệt kê 2 sản phẩm trở lên

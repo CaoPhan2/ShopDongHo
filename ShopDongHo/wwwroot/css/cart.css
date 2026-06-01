@@ -1,6 +1,6 @@
 ﻿/*-------------------------Giỏ hàng-------------------------*/
 .lux-cart {
-    padding: 60px 0;
+    padding: 25px 0;
 }
 
 .cart-page-header {
@@ -227,7 +227,58 @@
 
 
 
+/*////////////////// giỏ hàng trống //////////////*/
+.empty-cart {
+    text-align: center;
+    padding: 0 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
 
+.empty-cart-image img {
+    width: 220px;
+    max-width: 100%;
+}
+
+.empty-cart h2 {
+    font-size: 25px;
+    font-weight: 600;
+    color: #0d1b3e;
+    margin: 5px 0;
+}
+
+.empty-cart p {
+    color: #8a8a8a;
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.btn-homeshop {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #0a1f44;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: 0.3s;
+    margin-bottom: 25px;
+}
+
+    .btn-homeshop:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    }
+
+    .btn-homeshop span {
+        font-size: 18px;
+    }
 
 /*=====================Trang thanh toán==========================*/
 

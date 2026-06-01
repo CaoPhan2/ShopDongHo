@@ -203,19 +203,20 @@
         else
         {
             <div class="empty-cart">
+                <div class="empty-cart-image">
+                    <img src="~/images/empty-cart.jpg" alt="Empty Cart">
+                </div>
 
-                <i class="fa fa-shopping-bag"></i>
+                <h2>Giỏ hàng của bạn đang trống</h2>
 
-                <h3>Giỏ hàng đang trống</h3>
-
-                <a asp-controller="Home"
-                   asp-action="Index"
-                   class="btn-checkout">
-
-                    MUA SẮM NGAY
-
+                <p>
+                    Hãy khám phá những mẫu đồng hồ cao cấp<br>
+                    để thêm vào giỏ hàng của bạn.
+                </p> 
+                <a asp-controller="Home" asp-action="Index" class="btn-homeshop">
+                    TIẾP TỤC MUA SẮM
+                    <span>→</span>
                 </a>
-
             </div>
         }
 
