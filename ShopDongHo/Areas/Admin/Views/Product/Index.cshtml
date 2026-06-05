@@ -49,6 +49,7 @@
                                     <div class="p-desc">
                                         @Html.Raw(item.Description)
                                     </div>
+                                    <span class="p-desc-toggle">Xem thêm</span>
                                 </div>
                             </div>
                         </td>
@@ -119,6 +120,25 @@
 
 </div>
 
+<script>
+    document.querySelectorAll('.p-desc').forEach(function(desc) {
+
+        // Ẩn nút nếu mô tả ngắn
+        if (desc.innerText.length < 100) {
+            desc.nextElementSibling.style.display = 'none';
+            return;
+        }
+
+        desc.nextElementSibling.addEventListener('click', function() {
+
+            desc.classList.toggle('expanded');
+
+            this.innerText = desc.classList.contains('expanded')
+                ? 'Thu gọn'
+                : 'Xem thêm';
+        });
+    });
+</script>
 <style>
     /* CONTAINER */
     .product-container {
@@ -200,6 +220,7 @@
         font-size: 12px;
         color: #777;
         max-width: 200px;
+        max-height: 150px;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         overflow: hidden;
@@ -267,4 +288,24 @@
             background: #dc3545;
             color: #fff;
         }
+
+
+    .p-desc {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 5;
+        overflow: hidden;
+    }
+
+    .p-desc.expanded {
+        display: block;
+        -webkit-line-clamp: unset;
+        max-height: none;
+        overflow: visible;
+    }
+    .p-desc-toggle {
+        color: #007bff;
+        cursor: pointer;
+        font-size: 12px;
+    }
 </style>

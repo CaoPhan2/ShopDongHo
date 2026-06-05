@@ -218,5 +218,50 @@ namespace ShopDongHo.Areas.Admin.Controllers
             return RedirectToAction("AddQuantity", "Product", new { Id = productQuantityModel.ProductId });
 
         }
+
+        [HttpPost]
+        [Route("GenerateDescription")]
+        public async Task<IActionResult> GenerateDescription(string name,string price,string category,string brand,string extraInfo)   
+        {
+            var prompt = $@"
+                Bạn là chuyên gia bán đồng hồ.
+
+                Hãy viết mô tả sản phẩm chuyên nghiệp.
+
+                Tên sản phẩm: {name}
+                Giá: {price}
+                Danh mục: {category}
+                Thương hiệu: {brand}
+
+                Thông tin bổ sung:
+                {extraInfo}
+                Yêu cầu:
+                - Độ dài khoảng 100-150 từ
+                - Văn phong bán hàng
+                - Nêu ưu điểm nổi bật
+                - Không dùng icon
+                ";
+
+            using var client = new HttpClient();
+
+            var requestData = new
+            {
+                model = "gemma3:1b",
+                prompt = prompt,
+                stream = false
+            };
+
+            var response = await client.PostAsJsonAsync(
+                "http://localhost:11434/api/generate",
+                requestData);
+
+            var result = await response.Content.ReadFromJsonAsync<OllamaResponse>();
+
+
+            return Json(new
+            {
+                description = result?.Response
+            });
+        }
     }
 }

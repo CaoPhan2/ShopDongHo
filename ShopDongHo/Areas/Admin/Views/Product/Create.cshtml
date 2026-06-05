@@ -7,64 +7,78 @@
 <section class="create-product-section">
 
     <div class="create-product-box">
-        <h2>Create Product</h2>
+        <h2>Thêm sản phẩm</h2>
 
         <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="form-group">
-                <label>Name</label>
-                <input asp-for="Name" class="form-control" />
+                <label>Tên sản phẩm</label>
+                <input asp-for="Name" class="form-control" id="Name" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label>Price</label>
-                <input asp-for="Price" pattern="[0-9.,]+" class="form-control typing-price" />
+                <label>Giá</label>
+                <input asp-for="Price" id="Price" pattern="[0-9.,]+" class="form-control typing-price" />
                 <span class="price-convert text-muted"></span>
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
+            
 
             <div class="form-group">
-                <label>Capital Price</label>
+                <label>Giá vốn</label>
                 <input asp-for="CapitalPrice" pattern="[0-9.,]+" class="form-control typing-price" />
                 <span class="price-convert text-muted"></span>
                 <span asp-validation-for="CapitalPrice" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label>Description</label>
-                <textarea asp-for="Description" class="form-control"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label>Số lượng</label>
+                <input asp-for="Quantity" id="Quantity" pattern="[0-9.,]+" class="form-control" />
+                <span class="price-convert text-muted"></span>
+                <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label>Thông số kỹ thuật</label>
+                <textarea id="ExtraInfo" class="form-control" rows="3" placeholder="Ví dụ: Dây da màu đen, chống nước 50m..."></textarea>
+            </div>
+            
 
             <div class="form-group">
-                <label>Category</label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-                    <option value="">-- Choose category --</option>
+                <label>Danh mục</label>
+                <select asp-for="CategoryId" id="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                    <option value="">-- Chọn danh mục --</option>
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label>Brand</label>
-                <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brands">
-                    <option value="">-- Choose brand --</option>
+                <label>Thương hiệu</label>
+                <select asp-for="BrandId" id="BrandId" class="form-control" asp-items="ViewBag.Brands">
+                    <option value="">-- Chọn thương hiệu --</option>
                 </select>
                 <span asp-validation-for="BrandId" class="text-danger"></span>
             </div>
-
             <div class="form-group">
-                <label>Image</label>
+                <label>Mô tả</label>
+                <textarea asp-for="Description" id="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <button type="button" id="btnGenerateDescription" class="btn btn-primary mt-2">
+                    Tạo mô tả bằng AI
+                </button>
+
+            </div>
+            <div class="form-group">
+                <label>Hình ảnh</label>
                 <input asp-for="ImageUpload" type="file" class="form-control" />
                 <span asp-validation-for="ImageUpload" class="text-danger"></span>
                 <img id="imgpreview" />
             </div>
 
-            <button type="submit" class="btn-create">Create Product</button>
+            <button type="submit" class="btn-create">Thêm</button>
         </form>
 
-        <a asp-action="Index" class="back-link">← Back to list</a>
+        <a asp-action="Index" class="back-link">← Quay lại danh sách</a>
     </div>
 
 </section>
@@ -96,6 +110,42 @@
             }).format(value);
 
             $(this).closest(".form-group").find(".price-convert").html(formatted);
+        });
+    </script>
+
+    <script>
+        $("#btnGenerateDescription").click(function () {
+
+            let btn = $(this);
+
+            btn.prop("disabled", true);
+            btn.text("AI đang viết...");
+
+            $.ajax({
+                url: "/Admin/Product/GenerateDescription",
+                type: "POST",
+                data: {
+                    name: $("#Name").val(),
+                    price: $("#Price").val(),
+                    category: $("#CategoryId option:selected").text(),
+                    brand: $("#BrandId option:selected").text(),
+                    extraInfo: $("#ExtraInfo").val()
+                },
+                success: function (res) {
+
+                    $("#Description").val(res.description);
+
+                    btn.prop("disabled", false);
+                    btn.text("Tạo mô tả bằng AI");
+                },
+                error: function () {
+
+                    alert("Không thể kết nối AI");
+
+                    btn.prop("disabled", false);
+                    btn.text("Tạo mô tả bằng AI");
+                }
+            });
         });
     </script>
 }

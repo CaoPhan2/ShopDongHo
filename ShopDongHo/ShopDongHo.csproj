@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
-    <Folder Include="wwwroot\backend\css\" />
     <Folder Include="wwwroot\media\logo\" />
     <Folder Include="wwwroot\media\avatars\" />
     <Folder Include="wwwroot\media\sliders\" />

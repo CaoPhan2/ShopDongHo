@@ -7,19 +7,18 @@
 	<meta name="author" content="">
 	<title>Home | E-Shopper</title>
 	<link href="~/css/bootstrap.min.css" rel="stylesheet">
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
-		<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.min.css" rel="stylesheet">
-		<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.2/themes/base/jquery-ui.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-		<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.dataTables.min.css">
-		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-		<link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css">
-		<script src="https://cdn.datatables.net/1.13.8/js/dataTables.min.js"></script>
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-			  
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.1/css/font-awesome.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.2/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.dataTables.min.css">
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css">
+	<script src="https://cdn.datatables.net/1.13.8/js/dataTables.min.js"></script>
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
 	<link href="~/css/prettyPhoto.css" rel="stylesheet">
 	<link href="~/css/price-range.css" rel="stylesheet">
 	<link href="~/css/animate.css" rel="stylesheet">
@@ -29,16 +28,12 @@
 	<link href="~/css/product.css" rel="stylesheet">
 	<link href="~/css/cart.css" rel="stylesheet">
 	<link href="~/css/account.css" rel="stylesheet">
-	<!--[if lt IE 9]>
-	<script src="~/js/html5shiv.js"></script>
-	<script src="~/js/respond.min.js"></script>
-	<![endif]-->
 	<link rel="shortcut icon" href="images/ico/favicon.ico">
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
-</head><!--/head-->
+</head>
 
 <body>
 	<header id="header">
@@ -52,14 +47,12 @@
 		</div>
 
 		<div class="main-header">
-			<!-- LOGO -->
 			<div class="logo">
 				<a asp-controller="Home" asp-action="Index">
 					<img src="~/images/lg-removebg.png" alt="logo" />
 				</a>
 			</div>
 
-			<!-- MENU -->
 			<nav class="nav-menu">
 				<a asp-controller="Home" asp-action="Index">Trang Chủ</a>
 				@await Component.InvokeAsync("Categories", new { viewName = "NavMenu" })
@@ -69,81 +62,72 @@
 				<a asp-controller="Home" asp-action="Contact">Liên hệ</a>
 			</nav>
 
-			<!-- RIGHT -->
 			<div class="header-right">
-				<form asp-controller="Product" asp-action="Search" method="post" class="search-box">
-					<input type="text" name="keyWord" placeholder="Tìm kiếm..." />
-					<button type="submit"><i class="fa fa-search"></i></button>
+				<form asp-controller="Product" asp-action="Search" method="post" class="search-box" id="header-search-form" enctype="multipart/form-data">
+
+					<div class="search-input-container">
+						<div id="input-image-preview-container">
+							<img id="input-mini-preview" src="" alt="preview" />
+							<button type="button" id="remove-preview-btn" title="Xóa ảnh chọn">&times;</button>
+						</div>
+
+						<input type="text" name="keyWord" placeholder="Tìm kiếm..." autocomplete="off" />
+					</div>
+
+					<button type="button" id="header-image-btn" title="Tìm bằng ảnh">
+						<i class="fa fa-image" aria-hidden="true"></i>
+					</button>
+					<input type="file" id="header-image-input" accept="image/*" style="display:none" />
+
+					<button type="submit" id="search-submit-btn"><i class="fa fa-search"></i></button>
 				</form>
 
-				<a asp-controller="Cart" asp-action="Index" title="Giỏ hàng"> 
+				<a asp-controller="Cart" asp-action="Index" title="Giỏ hàng">
 					<i class="fa fa-shopping-cart" style="font-size: 24px"></i>
 				</a>
 				@if (User.Identity?.IsAuthenticated ?? false)
 				{
 					<div class="dropdown">
-
-						<span>
-							Xin chào, @User.Identity.Name ▾
-						</span>
-
+						<span>Xin chào, @User.Identity.Name ▾</span>
 						<div class="dropdown-menu">
-
-							<a asp-action="History"
-							   asp-controller="Account">
-								Lịch sử mua hàng
-							</a>
-
-							<a asp-action="UpdateAccount"
-							   asp-controller="Account">
-								Cập nhật thông tin
-							</a>
-
-							<a asp-controller="Account"
-							   asp-action="Logout"
-							   onclick="return confirm('Bạn có muốn đăng xuất không?')">
-
-								Đăng Xuất
-
-							</a>
-
+							<a asp-action="History" asp-controller="Account">Lịch sử mua hàng</a>
+							<a asp-action="UpdateAccount" asp-controller="Account">Cập nhật thông tin</a>
+							<a asp-controller="Account" asp-action="Logout" onclick="return confirm('Bạn có muốn đăng xuất không?')">Đăng Xuất</a>
 						</div>
-
 					</div>
 				}
 				else
 				{
-					<a asp-controller="Account"
-					   asp-action="Login">
-
-						Đăng Nhập
-
-					</a>
+					<a asp-controller="Account" asp-action="Login">Đăng Nhập</a>
 				}
 			</div>
 		</div>
 	</header>
+
+	<div id="fullscreen-loading-overlay" style="display: none;">
+		<div class="loading-box">
+			<div class="loading-spinner"></div>
+			<h3>AI đang phân tích hình ảnh của bạn...</h3>
+			<p>Hệ thống đang trích xuất từ khóa, vui lòng đợi trong giây lát</p>
+		</div>
+	</div>
 
 	<partial name="_HomeBannerPartial" />
 
 	<section>
 		<div class="container">
 			<div class="row">
-                @Html.Partial("_NotificationPartial")
-                @RenderBody()
+				@Html.Partial("_NotificationPartial")
+				@RenderBody()
 			</div>
 		</div>
 	</section>
-	<!-- CHAT BUBBLE -->
-	<partial name="_ChatbotPartial"/>
-	
+
+	<partial name="_ChatbotPartial" />
+
 	<footer id="footer">
-		<!--Footer-->
-        <partial name="_FooterPartial"/>
-		
-	</footer><!--/Footer-->
-
-
+		<partial name="_FooterPartial" />
+	</footer>
 
 
 	<script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v25.0&appId=APP_ID"></script>
@@ -156,77 +140,162 @@
 	<script src="~/js/product.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.22/dist/sweetalert2.all.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
 	<script>
 		let slides = document.querySelectorAll(".lux-slider .slide");
 		let next = document.querySelector(".next");
 		let prev = document.querySelector(".prev");
 		let dotsContainer = document.querySelector(".dots");
-
 		let index = 0;
 
-		/* tạo dots */
-		slides.forEach((_, i) => {
-			let dot = document.createElement("span");
-			if(i === 0) dot.classList.add("active");
-			dot.addEventListener("click", () => showSlide(i));
-			dotsContainer.appendChild(dot);
-		});
+		if (slides.length > 0 && dotsContainer) {
+			slides.forEach((_, i) => {
+				let dot = document.createElement("span");
+				if(i === 0) dot.classList.add("active");
+				dot.addEventListener("click", () => showSlide(i));
+				dotsContainer.appendChild(dot);
+			});
 
-		let dots = document.querySelectorAll(".dots span");
+			let dots = document.querySelectorAll(".dots span");
 
-		function showSlide(i) {
-			slides[index].classList.remove("active");
-			dots[index].classList.remove("active");
+			function showSlide(i) {
+				slides[index].classList.remove("active");
+				dots[index].classList.remove("active");
+				index = i;
+				slides[index].classList.add("active");
+				dots[index].classList.add("active");
+			}
 
-			index = i;
+			if (next) {
+				next.onclick = () => {
+					let i = (index + 1) % slides.length;
+					showSlide(i);
+				};
+			}
 
-			slides[index].classList.add("active");
-			dots[index].classList.add("active");
+			if (prev) {
+				prev.onclick = () => {
+					let i = (index - 1 + slides.length) % slides.length;
+					showSlide(i);
+				};
+			}
+
+			setInterval(() => {
+				if (next) next.click();
+			}, 6000);
 		}
-
-		next.onclick = () => {
-			let i = (index + 1) % slides.length;
-			showSlide(i);
-		};
-
-		prev.onclick = () => {
-			let i = (index - 1 + slides.length) % slides.length;
-			showSlide(i);
-		};
-
-		/* auto chạy */
-		setInterval(() => {
-			next.click();
-		}, 6000);
-
-
 	</script>
 
-	
 	<script>
+		$(document).ready(function () {
+			const $imgBtn = $('#header-image-btn');
+			const $imgInput = $('#header-image-input');
+			const $searchForm = $('#header-search-form');
+			const $searchInput = $searchForm.find('input[name="keyWord"]');
+			const $previewContainer = $('#input-image-preview-container');
+			const $miniPreview = $('#input-mini-preview');
+			const $removePreviewBtn = $('#remove-preview-btn');
+			const $loadingOverlay = $('#fullscreen-loading-overlay');
 
+			let selectedImageFile = null;
+
+			if (!$imgBtn.length || !$imgInput.length || !$searchForm.length || !$searchInput.length) return;
+
+			// Mở hộp thoại chọn tệp hệ thống
+			$imgBtn.on('click', function () {
+				$imgInput.click();
+			});
+
+			// Lắng nghe sự kiện sau khi tệp tin hình ảnh được nạp vào
+			$imgInput.on('change', function () {
+				const file = this.files && this.files[0];
+				if (!file) return;
+
+				if (!file.type.startsWith('image/')) {
+					Swal.fire('Sai định dạng', 'Vui lòng chọn một file hình ảnh hợp lệ (jpg, png, webp).', 'warning');
+					return;
+				}
+
+				const maxSize = 12 * 1024 * 1024; // Hỗ trợ tối đa 12MB theo cấu hình gốc
+				if (file.size > maxSize) {
+					Swal.fire('File quá lớn', 'Vui lòng chọn hình ảnh có dung lượng nhỏ hơn 12MB.', 'warning');
+					return;
+				}
+
+				selectedImageFile = file;
+
+				// Chuyển đổi dữ liệu ảnh để hiển thị mini-thumbnail trong lòng input
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					$miniPreview.attr('src', e.target.result);
+					$previewContainer.css('display', 'flex');
+					$searchInput.attr('placeholder', 'Thêm từ khóa bổ sung...');
+					$searchInput.focus();
+				};
+				reader.readAsDataURL(file);
+			});
+
+			// Nhấn dấu X để hủy chọn hình ảnh
+			$removePreviewBtn.on('click', function (e) {
+				e.stopPropagation();
+				selectedImageFile = null;
+				$imgInput.val('');
+				$previewContainer.css('display', 'none');
+				$miniPreview.attr('src', '');
+				$searchInput.attr('placeholder', 'Tìm kiếm...');
+			});
+
+			// Kiểm soát hành vi khi form thực hiện gửi dữ liệu (Submit)
+					$searchForm.on('submit', async function (e) {
+			if (!selectedImageFile) return; // Nếu không có ảnh, để form submit bình thường
+
+			e.preventDefault();
+			$loadingOverlay.fadeIn(200);
+
+			const formData = new FormData();
+			formData.append('image', selectedImageFile);
+			formData.append('keyWord', $searchInput.val()); // Gửi thêm từ khóa text
+
+			try {
+				const resp = await fetch('/ImageSearch/Search', {
+					method: 'POST',
+					body: formData
+				});
+
+				const data = await resp.json();
+				$loadingOverlay.fadeOut(200);
+
+				if (data.success) {
+					$searchInput.val(data.keywords);
+					$searchForm.off('submit').submit(); // Submit lại form với từ khóa đã update
+				} else {
+					Swal.fire('Thông báo', data.message, 'warning');
+				}
+			} catch (err) {
+				$loadingOverlay.fadeOut(200);
+				Swal.fire('Lỗi', 'Không thể kết nối tới server.', 'error');
+			}
+		});
+		});
+	</script>
+
+	<script>
 		const currentPath = window.location.pathname.toLowerCase();
-
 		document.querySelectorAll('.nav-menu a').forEach(link => {
-
 			const linkPath = new URL(link.href).pathname.toLowerCase();
-
 			if (currentPath === linkPath) {
 				link.classList.add('active');
-			}
-			else {
+			} else {
 				link.classList.remove('active');
 			}
-
 		});
-
 	</script>
-	
-	@await RenderSectionAsync("Scripts", required: false)
 
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
+
 <style>
-	/* RESET */
+	/* RESET MẶC ĐỊNH */
 	* {
 		margin: 0;
 		padding: 0;
@@ -262,7 +331,7 @@
 		margin: -30px 0;
 	}
 
-	/* MENU */
+	/* MENU ĐIỀU HƯỚNG */
 	.nav-menu {
 		display: flex;
 		gap: 25px;
@@ -275,14 +344,11 @@
 			text-transform: uppercase;
 		}
 
-
-
 			.nav-menu a.active {
 				border-bottom: 2px solid #0b2c5f;
 			}
 
-
-	/* DROPDOWN */
+	/* DROPDOWN TÀI KHOẢN */
 	.dropdown {
 		position: relative;
 		cursor: pointer;
@@ -302,6 +368,7 @@
 		display: none;
 		flex-direction: column;
 		box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+		z-index: 100;
 	}
 
 		.dropdown-menu a {
@@ -317,29 +384,166 @@
 		display: block;
 	}
 
-
-
-	/* SEARCH */
+	/* KHU VỰC KHUNG TÌM KIẾM CẢI TIẾN */
 	.search-box {
 		display: flex;
-		border: 1px solid #ddd;
-		border-radius: 5px;
-		overflow: hidden;
+		align-items: center;
+		border: 1px solid #cbd5e1;
+		border-radius: 6px;
+		background: #ffffff;
+		padding: 2px;
+		min-width: 320px;
+		transition: all 0.3s ease;
 	}
 
-		.search-box input {
-			border: none;
-			padding: 5px 10px;
+		.search-box:focus-within {
+			border-color: #0b2c5f;
+			box-shadow: 0 0 0 3px rgba(11, 44, 95, 0.15);
 		}
 
-		.search-box button {
-			background: #0b2c5f;
-			color: #fff;
-			border: none;
-			padding: 5px 10px;
+	.search-input-container {
+		display: flex;
+		align-items: center;
+		flex: 1;
+		padding-left: 6px;
+	}
+
+	/* Vùng hiển thị ảnh nhỏ mini nhúng đầu Input */
+	#input-image-preview-container {
+		display: none;
+		align-items: center;
+		background: #f1f5f9;
+		border: 1px solid #e2e8f0;
+		border-radius: 4px;
+		padding: 2px 4px;
+		margin-right: 6px;
+	}
+
+	#input-mini-preview {
+		height: 24px;
+		width: 24px;
+		object-fit: cover;
+		border-radius: 3px;
+	}
+
+	#remove-preview-btn {
+		border: none;
+		background: transparent;
+		color: #ef4444;
+		font-size: 16px;
+		font-weight: bold;
+		cursor: pointer;
+		margin-left: 4px;
+		padding: 0 2px;
+		line-height: 1;
+	}
+
+		#remove-preview-btn:hover {
+			color: #dc2626;
 		}
 
-	/* RIGHT */
+	.search-box .search-input-container input[type="text"] {
+		border: none !important;
+		outline: none !important;
+		padding: 6px 4px;
+		width: 100%;
+		font-size: 14px;
+		color: #334155;
+		background: transparent;
+	}
+
+	#header-image-btn {
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		padding: 0 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform 0.2s;
+	}
+
+		#header-image-btn i {
+			font-size: 18px;
+			color: #0b2c5f;
+		}
+
+		#header-image-btn:hover {
+			transform: scale(1.1);
+		}
+
+	#search-submit-btn {
+		background: #0b2c5f;
+		color: #fff;
+		border: none;
+		border-radius: 4px;
+		padding: 7px 14px;
+		cursor: pointer;
+		transition: background 0.2s;
+	}
+
+		#search-submit-btn:hover {
+			background: #061b3d;
+		}
+
+	/* MÀN HÌNH CHỜ HIỆU ỨNG LÀM MỜ KÍNH (BACKDROP BLUR OVERLAY) */
+	#fullscreen-loading-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(15, 23, 42, 0.75);
+		backdrop-filter: blur(5px);
+		z-index: 99999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.loading-box {
+		background: #ffffff;
+		padding: 30px 40px;
+		border-radius: 12px;
+		box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+		text-align: center;
+		max-width: 420px;
+		width: 90%;
+	}
+
+	.loading-spinner {
+		width: 45px;
+		height: 45px;
+		border: 4px solid #e2e8f0;
+		border-top-color: #0b2c5f;
+		border-radius: 50%;
+		animation: spinAction 0.8s linear infinite;
+		margin: 0 auto 15px auto;
+	}
+
+	.loading-box h3 {
+		font-size: 18px;
+		color: #0f172a;
+		margin-bottom: 6px;
+		font-weight: 600;
+	}
+
+	.loading-box p {
+		font-size: 14px;
+		color: #64748b;
+		margin: 0;
+	}
+
+	@@keyframes spinAction {
+		to
+
+	{
+		transform: rotate(360deg);
+	}
+
+	}
+
+	/* PHẦN RIGHT KHÁC TRÊN HEADER */
 	.header-right {
 		display: flex;
 		align-items: center;
@@ -352,8 +556,7 @@
 			font-weight: 500;
 		}
 
-	/* SLIDER */
-
+	/* LUXURY SLIDER KHỐI ĐỊNH DẠNG */
 	.lux-slider {
 		position: relative;
 		height: 350px;
@@ -361,7 +564,6 @@
 		background: #0b1d3a;
 	}
 
-		/* slide */
 		.lux-slider .slide {
 			position: absolute;
 			width: 100%;
@@ -375,7 +577,6 @@
 				z-index: 2;
 			}
 
-			/* ảnh */
 			.lux-slider .slide img {
 				width: 100%;
 				height: 100%;
@@ -388,7 +589,6 @@
 				transform: scale(1);
 			}
 
-	/* overlay tối */
 	.overlay {
 		position: absolute;
 		width: 100%;
@@ -397,7 +597,6 @@
 		z-index: 1;
 	}
 
-	/* content */
 	.content {
 		position: absolute;
 		top: 50%;
@@ -436,7 +635,6 @@
 		transition: 1s;
 	}
 
-	/* khi active -> animate vào */
 	.lux-slider .slide.active .content h1,
 	.lux-slider .slide.active .content p,
 	.lux-slider .slide.active .btn {
@@ -444,7 +642,6 @@
 		opacity: 1;
 	}
 
-	/* controls */
 	.controls span {
 		position: absolute;
 		top: 50%;
@@ -464,7 +661,6 @@
 		right: 20px;
 	}
 
-	/* dots */
 	.dots {
 		position: absolute;
 		bottom: 20px;
@@ -486,7 +682,7 @@
 		.dots .active {
 			background: white;
 		}
-	/* BUTTON */
+
 	.btn-shop {
 		display: inline-block;
 		padding: 10px 20px;
@@ -501,7 +697,6 @@
 			color: #0b2c5f;
 		}
 
-	/* ARROWS */
 	.control-carousel i {
 		font-size: 30px;
 		color: #fff;
@@ -521,7 +716,7 @@
 	.right {
 		right: 20px;
 	}
-	/* FEATURE ICONS */
+
 	.features {
 		display: flex;
 		justify-content: space-between;
@@ -533,7 +728,6 @@
 			flex: 1;
 		}
 
-	/* PRODUCT CARD */
 	.product-item {
 		border: 1px solid #eee;
 		padding: 10px;
@@ -599,9 +793,5 @@
 		.policy-content p span {
 			color: #999;
 		}
-
-
-	
 </style>
-
 </html>
