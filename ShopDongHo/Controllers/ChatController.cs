@@ -23,10 +23,12 @@ namespace ShopDongHo.Controllers
             ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
         });
 
-        // API KEY DUY NHẤT SỬ DỤNG CHO HỆ THỐNG
+        // API KEY 
         private const string API_KEY = "";
         private const string GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
 
+
+        
         public ChatController(DataContext context)
         {
             _context = context;
@@ -45,7 +47,7 @@ namespace ShopDongHo.Controllers
 
             try
             {
-                // TẦNG 1: XỬ LÝ NHANH KHÔNG CẦN AI (Chào hỏi & Liên hệ)
+                
                 if (IsGreeting(userMessageLower))
                 {
                     return Json(new ChatResponse
@@ -72,29 +74,29 @@ namespace ShopDongHo.Controllers
                     return Json(new ChatResponse { Reply = reply });
                 }
 
-                // TẦNG 2: RAG - TRUY VẤN NGỮ CẢNH DỮ LIỆU TỪ DATABASE
+                // lấy dữ liệu từ db
                 var allCategories = await _context.Categories.AsNoTracking().Select(c => c.Name).ToListAsync();
                 var allBrands = await _context.Brands.AsNoTracking().Select(b => b.Name).ToListAsync();
 
-                // Gọi hàm lọc từ khóa thông minh độc lập (Đã loại bỏ bảng Ratings trống)
+                // Gọi hàm lọc từ khóa thông minh (Đã ưu tiên nhận diện Thương hiệu)
                 var matchedProducts = await GetProductContextData(userMessageLower);
 
                 string productContext = "Hiện tại không có sản phẩm cụ thể nào khớp chính xác từ khóa khách hàng tìm kiếm trong kho.";
                 if (matchedProducts.Any())
                 {
                     var contextData = matchedProducts.Select(p => new {
-                        p.Id, // Kiểu long tự động map an toàn sang định dạng số JSON
+                        p.Id,
                         p.Name,
-                        BrandName = p.Brand?.Name ?? "Chưa rõ",
+                        BrandName = p.Brand?.Name ?? "Chưa rõ", 
                         Price = p.Price,
-                        ImageUrl = p.Images, // Khớp chuẩn xác với trường Images (string) trong ProductModel của bạn
-                        Rating = 5, // Gán cứng mặc định 5 sao vì DB chưa có dữ liệu Ratings thực tế, giúp UI luôn đẹp
+                        ImageUrl = p.Images,
+                        Rating = 5,
                         Url = $"/san-pham/{p.Slug}"
                     });
                     productContext = JsonSerializer.Serialize(contextData);
                 }
 
-                // Lấy lịch sử trò chuyện theo SessionId (3 lượt gần nhất)
+                // Lấy lịch sử trò chuyện theo SessionId 
                 var history = await _context.ChatHistory
                     .Where(h => h.SessionId == req.SessionId)
                     .OrderByDescending(h => h.CreatedAt)
@@ -111,41 +113,39 @@ namespace ShopDongHo.Controllers
 
                 contentsList.Add(new { role = "user", parts = new[] { new { text = $"[KHO SẢN PHẨM THỰC TẾ TRONG HỆ THỐNG]:\n{productContext}\n\n[TIN NHẮN MỚI CỦA KHÁCH HÀNG]: {userMessage}" } } });
 
-                // TẦNG 3: SYSTEM INSTRUCTION (Ép cấu trúc khối Inline Card & Sửa lỗi chuỗi lồng nhau của C#)
+                // TẦNG 3: SYSTEM INSTRUCTION
                 string storeName = "C&P Store";
                 string categoryContext = string.Join(", ", allCategories);
                 string brandContext = string.Join(", ", allBrands);
                 string systemInstruction = $@"
-Bạn là trợ lý AI bán hàng chuyên nghiệp, am hiểu sâu sắc về các dòng sản phẩm của cửa hàng {storeName}.
+                    Bạn là trợ lý AI bán hàng chuyên nghiệp, am hiểu sâu sắc về các dòng sản phẩm của cửa hàng {storeName}.
 
-DANH MỤC CÓ SẴN: {categoryContext}
-THƯƠNG HIỆU CÓ SẴN: {brandContext}
-KHO SẢN PHẨM THỰC TẾ (CHỈ ĐƯỢC DÙNG THÔNG TIN TRONG NÀY, KHÔNG TỰ BỊA GIÁ HAY SẢN PHẨM): {productContext}
+                    DANH MỤC CÓ SẴN: {categoryContext}
+                    THƯƠNG HIỆU CÓ SẴN: {brandContext}
+                    KHO SẢN PHẨM THỰC TẾ (CHỈ ĐƯỢC DÙNG THÔNG TIN TRONG NÀY, KHÔNG TỰ BỊA GIÁ HAY SẢN PHẨM): {productContext}
 
-QUY TẮC PHẢN HỒI (BẮT BUỘC):
-1. Luôn tư vấn bằng giọng điệu thân thiện, tự nhiên, lễ phép và chuyên nghiệp (Ví dụ: ""Dạ, shop em xin chào anh/chị ạ..."", ""Dạ anh/chị...""). Cuối câu trả lời luôn có câu hỏi gợi mở để tương tác tiếp với khách.
-2. Trình bày danh sách sản phẩm theo định dạng Markdown có số thứ tự. Tên sản phẩm PHẢI in đậm (ví dụ: **HP Spectre x360**). Các đặc tính nổi bật hoặc mô tả ngắn gọn đi kèm phải viết rõ ràng, mạch lạc sau dấu gạch ngang ""-"".
-3. Với MỖI sản phẩm được nhắc đến trong danh sách, ngay dưới dòng mô tả văn bản, bạn PHẢI chèn chuỗi JSON của sản phẩm đó nằm giữa thẻ [PRODUCT_CARD] và [/PRODUCT_CARD] ở một dòng riêng biệt.
+                    QUY TẮC PHẢN HỒI (BẮT BUỘC):
+                    1. Luôn tư vấn bằng giọng điệu thân thiện, tự nhiên, lễ phép và chuyên nghiệp (Ví dụ: ""Dạ, shop em xin chào anh/chị ạ..."", ""Dạ anh/chị...""). Cuối câu trả lời luôn có câu hỏi gợi mở để tương tác tiếp với khách.
+                    2. Trình bày danh sách sản phẩm theo định dạng Markdown có số thứ tự. Tên sản phẩm PHẢI in đậm (ví dụ: **Rolex Datejust Nữ**). Các đặc tính nổi bật hoặc mô tả ngắn gọn đi kèm phải viết rõ ràng, mạch lạc sau dấu gạch ngang ""-"".
+                    3. Với MỖI sản phẩm được nhắc đến trong danh sách, ngay dưới dòng mô tả văn bản, bạn PHẢI chèn chuỗi JSON của sản phẩm đó nằm giữa thẻ [PRODUCT_CARD] và [/PRODUCT_CARD] ở một dòng riêng biệt.
 
-Ví dụ cách trình bày danh sách kiểu khối xen kẽ văn bản để load giao diện:
-Dạ shop em xin gợi ý các mẫu đang cực hot bên em để mình tham khảo ạ:
+                    Ví dụ cách trình bày danh sách kiểu khối xen kẽ văn bản để load giao diện:
+                    Dạ shop em xin gợi ý các mẫu đang cực hot bên em để mình tham khảo ạ:
 
-1. **ASUS ROG Zephyrus G14** - Chiếc laptop gaming đỉnh cao sở hữu thiết kế mỏng nhẹ, di động.
-[PRODUCT_CARD]{{""id"":12,""name"":""ASUS ROG Zephyrus G14"",""price"":38000000,""imageUrl"":""asus-g14.jpg""}}[/PRODUCT_CARD]
+                    1. **Rolex Datejust Nữ** - Thiết kế tinh tế, quý phái dành cho phái đẹp.
+                    [PRODUCT_CARD]{{""id"":78,""name"":""Rolex Datejust Nữ"",""brandName"":""Rolex"",""price"":8800000,""imageUrl"":""rolex-nu.jpg""}}[/PRODUCT_CARD]
 
-4. **HP Spectre x360** - Chiếc laptop 2-in-1 đa năng với thiết kế sang trọng, màn hình cảm ứng xoay gập linh hoạt, lý tưởng cho cả công việc và giải trí.
-[PRODUCT_CARD]{{""id"":15,""name"":""HP Spectre x360"",""price"":36000000,""imageUrl"":""hp-spectre.jpg""}}[/PRODUCT_CARD]
+                    Anh/chị quan tâm đến dòng đồng hồ nào ở trên hoặc cần em tư vấn thêm tiêu chí nào khác không ạ?
 
-Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn thêm tiêu chí nào khác không ạ?
+                    * Chú ý cấu trúc thuộc tính JSON bên trong thẻ:
+                    - Tuyệt đối tuân thủ định dạng JSON bên trong thẻ, viết liền mạch trên 1 dòng, giữ đúng tên thuộc tính hệ thống yêu cầu.
+                    - ""id"": Điền chính xác ID từ dữ liệu hệ thống kho thực tế.
+                    - ""name"": Tên chính xác của sản phẩm.
+                    - ""brandName"": Tên thương hiệu của sản phẩm.
+                    - ""price"": Giá tiền kiểu số (không chứa dấu chấm hay ký tự đ).
+                    - ""imageUrl"": Tên file ảnh hoặc đường dẫn ảnh đi kèm từ hệ thống.";
 
-* Chú ý cấu trúc thuộc tính JSON bên trong thẻ:
-- Tuyệt đối tuân thủ định dạng JSON bên trong thẻ, viết liền mạch trên 1 dòng, giữ đúng tên thuộc tính hệ thống yêu cầu.
-- ""id"": Điền chính xác ID từ dữ liệu hệ thống kho thực tế.
-- ""name"": Tên chính xác của sản phẩm.
-- ""price"": Giá tiền kiểu số (không chứa dấu chấm hay ký tự đ).
-- ""imageUrl"": Tên file ảnh hoặc đường dẫn ảnh đi kèm từ hệ thống.";
-
-                // TẦNG 4: GỌI GEMINI API & SỬ DỤNG PARSE THỦ CÔNG CHỐNG LỖI PHIÊN BẢN
+                //  GỌI GEMINI API
                 var payload = new
                 {
                     contents = contentsList,
@@ -160,7 +160,6 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
                     throw new Exception($"Gemini lỗi HTTP {response.StatusCode}: {errReason}");
                 }
 
-                // Đọc chuỗi text thô trước rồi mới phân tích để đảm bảo an toàn tuyệt đối
                 string responseString = await response.Content.ReadAsStringAsync();
                 string botReply = "";
 
@@ -190,20 +189,15 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
                     throw new Exception($"Gemini trả về cấu trúc trống. Nội dung thô: {responseString}");
                 }
 
-                // Loại bỏ khối suy nghĩ ngầm nếu dùng model có suy nghĩ
                 botReply = Regex.Replace(botReply, @"<think>.*?</think>", "", RegexOptions.Singleline).Trim();
 
                 // Trích xuất danh sách đối tượng phục vụ Frontend
                 var productList = ExtractProductsFromCard(botReply);
-                string jsonProductList = System.Text.Json.JsonSerializer.Serialize(productList, new System.Text.Json.JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
-                // In ra cửa sổ Console
+
                 Console.WriteLine("--- DANH SÁCH PRODUCT LIST TRẢ VỀ ---");
-                Console.WriteLine(productList);
-                // TẦNG 5: LƯU LỊCH SỬ VÀ TRẢ VỀ KẾT QUẢ
-                // LƯU Ý: Nếu Database bảng ChatHistory bị lỗi độ dài cột (nvarchar ngắn quá), hãy chạy Migration tăng lên nvarchar(max).
+                Console.WriteLine(JsonSerializer.Serialize(productList));
+
+                // LƯU LỊCH SỬ VÀ TRẢ VỀ KẾT QUẢ
                 await _context.ChatHistory.AddAsync(new ChatHistory
                 {
                     SessionId = req.SessionId,
@@ -221,20 +215,22 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
             }
             catch (Exception ex)
             {
-                // Thay vì ẩn lỗi, gán trực tiếp thông tin ngoại lệ (Exception) trả về giao diện 
-                // để bạn biết chính xác dòng nào trong code, bảng nào trong database hoặc lỗi phân tích gì đang làm sập hệ thống.
-                string detailedError = $"[LỖI HỆ THỐNG]: {ex.Message} \n[VỊ TRÍ]: {ex.StackTrace}";
-                System.Diagnostics.Debug.WriteLine(detailedError);
+                System.Diagnostics.Debug.WriteLine($"[LỖI HỆ THỐNG]: {ex.Message} \n[VỊ TRÍ]: {ex.StackTrace}");
 
-                return Json(new ChatResponse { Reply = detailedError });
+                // Trả về thông báo lỗi nhẹ nhàng, chuyên nghiệp cho khách hàng thay vì quăng lỗi thô
+                return Json(new ChatResponse
+                {
+                    Reply = "Dạ, hệ thống kết nối của em đang gặp chút gián đoạn nhỏ. Anh/chị vui lòng thử gửi lại tin nhắn hoặc đợi em trong giây lát nhé! 🌸"
+                });
             }
         }
 
-        #region Các hàm hỗ trợ xử lý thuật toán RAG & Trích xuất thẻ
+       
         private bool IsGreeting(string text)
         {
-            string[] keywords = { "hi", "hello", "helo", "hêlo", "chào", "chao", "xin chào", "xin chao", "alo", "alô", "shop ơi", "cho hỏi" };
-            return keywords.Any(kw => text.Contains(kw));
+           
+            string[] keywords = { "hi", "hello", "xin chào", "xin chao", "alo shop" };
+            return keywords.Any(kw => text == kw || text.StartsWith(kw + " "));
         }
 
         private bool IsContactInquiry(string text)
@@ -244,44 +240,45 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
         }
 
         /// <summary>
-        /// Thuật toán tách từ khóa thông minh, loại bỏ bảng trống Ratings hoàn toàn an toàn
+        /// Thuật toán RAG tối ưu: Ưu tiên bóc tách và khớp chính xác theo Thương hiệu trước
         /// </summary>
         private async Task<List<ProductModel>> GetProductContextData(string msg)
         {
             string msgLower = msg.ToLower().Trim();
 
-            // 1. Quét tìm kiếm Thương hiệu độc lập xuất hiện trong câu nói của khách
-            var brands = await _context.Brands.AsNoTracking().Select(b => b.Name.ToLower()).ToListAsync();
-            string matchedBrand = brands.FirstOrDefault(b => msgLower.Contains(b));
+            // tìm tên Thương hiệu xuất hiện trong tin nhắn
+            var brands = await _context.Brands.AsNoTracking().ToListAsync();
+            var matchedBrand = brands.FirstOrDefault(b => msgLower.Contains(b.Name.ToLower()));
 
-            // 2. Định nghĩa danh sách các từ gây nhiễu cần bóc tách loại bỏ
-            string[] noiseWords = { "tôi", "muốn", "biết", "về", "sản", "phẩm", "đồng", "hồ", "cho", "hỏi", "tìm", "kiếm", "mẫu", "dòng", "xem", "loại", "chi tiết", "giá" };
+            // Nếu khách đề cập trực tiếp đến một Thương hiệu (ví dụ: "Rolex"), lấy ngay các sản phẩm của thương hiệu đó
+            if (matchedBrand != null)
+            {
+                return await _context.Products
+                    .Include(p => p.Brand)
+                    .Where(p => p.Brand != null && p.Brand.Id == matchedBrand.Id)
+                    .Take(10) // Lấy ra tối đa 10 sản phẩm
+                    .ToListAsync();
+            }
 
+            // Nếu không nhắc đến thương hiệu, tiến hành tách từ khóa tìm kiếm theo tên
+            string[] noiseWords = { "tôi", "muốn", "biết", "về", "sản", "phẩm", "cho", "hỏi", "tìm", "kiếm", "mẫu", "dòng", "xem", "loại", "chi tiết", "giá" };
             var words = msgLower.Split(new[] { ' ', ',', '.', '-', '/', '?', '!' }, StringSplitOptions.RemoveEmptyEntries)
                                 .Where(w => !noiseWords.Contains(w))
                                 .ToList();
 
-            if (!words.Any() && string.IsNullOrEmpty(matchedBrand))
+            if (!words.Any())
                 return new List<ProductModel>();
 
-            // Chỉ nạp bảng liên kết thương hiệu Brand, bỏ hẳn Ratings để tránh lỗi và tăng tốc độ SQL
             var query = _context.Products.Include(p => p.Brand).AsNoTracking().AsQueryable();
-
-            // 3. Thực hiện xây dựng câu lệnh SQL truy vấn động
-            if (!string.IsNullOrEmpty(matchedBrand))
-            {
-                query = query.Where(p => p.Brand != null && p.Brand.Name.ToLower() == matchedBrand);
-            }
-
             foreach (var word in words)
             {
-                if (word == matchedBrand) continue;
                 query = query.Where(p => p.Name.ToLower().Contains(word));
             }
 
-            return await query.Take(20).ToListAsync();
+            return await query.Take(5).ToListAsync();
         }
 
+        // tạo card sản phẩm 
         private List<ProductItemDto> ExtractProductsFromCard(string text)
         {
             var products = new List<ProductItemDto>();
@@ -294,9 +291,10 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
                     var dto = JsonSerializer.Deserialize<ProductItemDto>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                     if (dto != null)
                     {
+                        // Chuẩn hóa folder ảnh tĩnh đúng cấu trúc thực tế của bạn
                         if (!string.IsNullOrEmpty(dto.ImageUrl) && !dto.ImageUrl.StartsWith("http") && !dto.ImageUrl.StartsWith("/"))
                         {
-                            dto.ImageUrl = "/contents/images/" + dto.ImageUrl;
+                            dto.ImageUrl = "/media/products/" + dto.ImageUrl;
                         }
                         products.Add(dto);
                     }
@@ -305,34 +303,37 @@ Anh/chị quan tâm đến dòng laptop nào ở trên hoặc cần em tư vấn
             }
             return products;
         }
-        #endregion
-    }
 
-    #region Hệ thống DTO đồng bộ dữ liệu giao diện khối
-    public class ChatRequest
-    {
-        public string Message { get; set; }
-        public string SessionId { get; set; }
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetHistory(string sessionId)
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Json(new { success = false, messages = new List<object>() });
+            }
 
-    public class ChatResponse
-    {
-        public string Reply { get; set; }
-        public List<ProductItemDto> Products { get; set; } = new List<ProductItemDto>();
-    }
+            // Lấy toàn bộ lịch sử trò chuyện của phiên này, sắp xếp từ cũ đến mới
+            var history = await _context.ChatHistory
+                .Where(h => h.SessionId == sessionId)
+                .OrderBy(h => h.CreatedAt)
+                .ToListAsync();
 
-    public class ProductItemDto
-    {
-        public long Id { get; set; } // Khớp 100% với kiểu dữ liệu long trong Model của anh/chị
-        public int Index { get; set; }
-        public string Description { get; set; }
-        public string Name { get; set; }
-        public string Brand { get; set; }
-        public bool HasVerify { get; set; }
-        public int Rating { get; set; }
-        public decimal Price { get; set; }
-        public string ImageUrl { get; set; }
-        public string Url { get; set; }
+            var messages = new List<object>();
+            foreach (var h in history)
+            {
+                // Trích xuất lại danh sách card sản phẩm ẩn trong đoạn chat cũ (nếu có)
+                var products = ExtractProductsFromCard(h.BotReply);
+
+                messages.Add(new
+                {
+                    userMessage = h.UserMessage,
+                    botReply = h.BotReply,
+                    products = products,
+                    createdAt = h.CreatedAt.ToString("HH:mm")
+                });
+            }
+
+            return Json(new { success = true, messages = messages });
+        }
     }
-    #endregion
 }

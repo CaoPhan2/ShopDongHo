@@ -1,6 +1,28 @@
-﻿<div id="chat-bubble">
-    <div class="bubble-icon">💬</div>
-    <div class="bubble-text">AI ASSISTANT</div>
+﻿<div id="chat-bubble" class="ai-pro-bubble">
+
+    <div class="ai-pulse-ring"></div>
+    <div class="ai-pulse-ring delay"></div>
+
+
+    <div class="ai-core-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 12C20.9543 12 12 20.9543 12 32C12 43.0457 20.9543 52 32 52C43.0457 52 52 43.0457 52 32C52 20.9543 43.0457 12 32 12Z" stroke="url(#ai-gradient)" stroke-width="3" stroke-linecap="round" />
+            <path d="M22 32C22 26.4772 26.4772 22 32 22C37.5228 22 42 26.4772 42 32C42 37.5228 37.5228 42 32 42" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+            <circle cx="32" cy="32" r="5" fill="#FFFFFF" class="ai-dot-blink" />
+            <path d="M16 32H20M44 32H48M32 16V20M32 44V48" stroke="url(#ai-gradient)" stroke-width="3" stroke-linecap="round" />
+            <defs>
+                <linearGradient id="ai-gradient" x1="12" y1="12" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFB347" />
+                    <stop offset="1" stop-color="#FE980F" />
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <div class="ai-status-badge">
+        <span class="badge-dot"></span>
+        <span>TRỢ LÝ AI</span>
+    </div>
 </div>
 
 <div id="chat-box">
@@ -39,10 +61,11 @@
 </div>
 
 <script>
-    const sessionId = sessionStorage.getItem('chatSessionId')
+    // 1. CHUYỂN SANG LOCALSTORAGE ĐỂ GIỮ PHIÊN CHAT KHI RESET TRANG (F5)
+    const sessionId = localStorage.getItem('chatSessionId')
         ?? (() => {
-            const id = crypto.randomUUID();
-            sessionStorage.setItem('chatSessionId', id);
+            const id = "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('chatSessionId', id);
             return id;
         })();
 
@@ -86,56 +109,78 @@
         }, speed);
     }
 
+    
     async function loadHistory() {
         try {
-            const res = await fetch(`/Chat/History?sessionId=${sessionId}`);
-            const histories = await res.json();
-            if (!histories || histories.length === 0) return;
+            // Gọi đúng endpoint GetHistory của ChatController
+            const res = await fetch(`/Chat/GetHistory?sessionId=${sessionId}`);
+            const data = await res.json();
 
-            histories.forEach(h => {
-                const timeStr = new Date(h.createdAt).getHours() + ':' + String(new Date(h.createdAt).getMinutes()).padStart(2, '0');
+            if (!data.success || !data.messages || data.messages.length === 0) return;
 
-                addMessage(`
-                    <div class="msg-row user">
-                        <div class="bubble-wrap user">
-                            <div class="bubble user">${escapeHtml(h.userMessage)}</div>
-                            <span class="bubble-time">${timeStr}</span>
-                        </div>
-                    </div>
-                `);
+            // Ẩn tin nhắn nhanh nếu đã có lịch sử trò chuyện cũ
+            document.getElementById("quick-messages").style.display = "none";
 
-                let cleanReply = h.botReply.replace(/\[PRODUCT_CARD\][\s\S]*?\[\/PRODUCT_CARD\]/g, '').trim();
-
-                let productsHtml = "";
-                if (h.products && h.products.length > 0) {
-                    productsHtml = `<div class="product-vertical-list inside-bubble" style="margin-top: 10px; border-top: 1px dashed #e2e8f0; padding-top: 8px;">`;
-                    h.products.forEach(p => {
-                        productsHtml += `
-                            <div class="product-list-item visible" style="cursor: pointer;" onclick="window.location.href='${p.url}'">
-                                <img src="${p.imageUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='/images/no-image.jpg';">
-                                <div class="product-list-info">
-                                    <h4 class="product-list-name" title="${p.name}">${p.name}</h4>
-                                    <p class="product-list-price">${p.price.toLocaleString('vi-VN')}đ</p>
-                                </div>
-                                <div class="product-list-arrow">➤</div>
+            data.messages.forEach(h => {
+                // Hiển thị tin nhắn của User từ lịch sử
+                if (h.userMessage) {
+                    addMessage(`
+                        <div class="msg-row user">
+                            <div class="bubble-wrap user">
+                                <div class="bubble user">${escapeHtml(h.userMessage)}</div>
+                                <span class="bubble-time">${h.createdAt}</span>
                             </div>
-                        `;
-                    });
-                    productsHtml += `</div>`;
+                        </div>
+                    `);
                 }
 
-                addMessage(`
-                    <div class="msg-row">
-                        <div class="bot-msg-avatar">🤖</div>
-                        <div class="bubble-wrap bot" style="max-width: 82%;">
-                            <div class="bubble bot" style="width: 100%;">
-                                <span>${cleanReply}</span>
-                                ${productsHtml}
+                // Hiển thị tin nhắn của Bot từ lịch sử
+                if (h.botReply) {
+                    let cleanReply = h.botReply.replace(/\[PRODUCT_CARD\][\s\S]*?\[\/PRODUCT_CARD\]/g, '').trim();
+
+                    // Tách câu chốt tư vấn nếu có để hiển thị đẹp mắt
+                    const closingText = "Anh/chị có muốn em tư vấn thêm về mẫu đồng hồ này, hoặc cần xem thêm các sản phẩm khác không ạ?";
+                    let mainContent = cleanReply;
+                    let finalAskHtml = "";
+
+                    if (cleanReply.includes(closingText)) {
+                        mainContent = cleanReply.replace(closingText, '').trim();
+                        finalAskHtml = `<span style="display: block; margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 10px;">${closingText}</span>`;
+                    }
+
+                    // Tái dựng danh sách sản phẩm (Card) cũ lồng bên trong Bubble Chat
+                    let productsHtml = "";
+                    if (h.products && h.products.length > 0) {
+                        productsHtml = `<div class="product-vertical-list inside-bubble" style="margin: 6px 0 10px 0;">`;
+                        h.products.forEach(p => {
+                            productsHtml += `
+                                <div class="product-list-item visible" style="cursor: pointer;" onclick="window.location.href='${p.url}'">
+                                    <img src="${p.imageUrl}" alt="${p.name}" onerror="this.onerror=null; this.src='/images/no-image.jpg';">
+                                    <div class="product-list-info">
+                                        <h4 class="product-list-name" title="${p.name}">${p.name}</h4>
+                                        <p class="product-list-price">${p.price.toLocaleString('vi-VN')}đ</p>
+                                    </div>
+                                    <div class="product-list-arrow">➤</div>
+                                </div>
+                            `;
+                        });
+                        productsHtml += `</div>`;
+                    }
+
+                    addMessage(`
+                        <div class="msg-row">
+                            <div class="bot-msg-avatar">🤖</div>
+                            <div class="bubble-wrap bot" style="max-width: 82%;">
+                                <div class="bubble bot" style="width: 100%; display: flex; flex-direction: column; gap: 4px;">
+                                    <span style="white-space: pre-line;">${mainContent}</span>
+                                    ${productsHtml}
+                                    ${finalAskHtml}
+                                </div>
+                                <span class="bubble-time">${h.createdAt}</span>
                             </div>
-                            <span class="bubble-time">${timeStr}</span>
                         </div>
-                    </div>
-                `);
+                    `);
+                }
             });
             chatBody.scrollTop = chatBody.scrollHeight;
         } catch (e) {
@@ -171,27 +216,13 @@
             </div>
         `);
 
-        const clientHistory = [];
-        const allChatRows = chatBody.querySelectorAll('.msg-row');
-        allChatRows.forEach(row => {
-            const isUser = row.classList.contains('user');
-            const bubbleText = row.querySelector('.bubble span') ? row.querySelector('.bubble span').innerText : row.querySelector('.bubble')?.innerText;
-            if (bubbleText && !row.id.includes('loading-message')) {
-                clientHistory.push({
-                    Sender: isUser ? "user" : "model",
-                    Text: bubbleText.trim()
-                });
-            }
-        });
-
         try {
             const response = await fetch('/Chat/Ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: message,
-                    sessionId: sessionId,
-                    history: clientHistory
+                    sessionId: sessionId
                 })
             });
 
@@ -208,7 +239,7 @@
             document.getElementById("loading-message")?.remove();
 
             const uniqueId = "content-" + Date.now();
-            const botMsgNode = addMessage(`
+            addMessage(`
                 <div class="msg-row">
                     <div class="bot-msg-avatar">🤖</div>
                     <div class="bubble-wrap bot" style="max-width: 82%;">
@@ -221,10 +252,8 @@
 
             const container = document.getElementById(`${uniqueId}-container`);
 
-            // 1. Làm sạch dữ liệu: Xóa bỏ thẻ [PRODUCT_CARD] thô của hệ thống
             let cleanTextReply = data.reply.replace(/\[PRODUCT_CARD\][\s\S]*?\[\/PRODUCT_CARD\]/g, '').trim();
 
-            // 2. Tách câu kết tư vấn để dành hiển thị cuối cùng
             const closingText = "Anh/chị có muốn em tư vấn thêm về mẫu đồng hồ này, hoặc cần xem thêm các sản phẩm khác không ạ?";
             let mainContent = cleanTextReply;
             let finalAsk = "";
@@ -234,13 +263,10 @@
                 finalAsk = closingText;
             }
 
-            // 3. Phân tách văn bản dựa theo số thứ tự của các sản phẩm "1. ", "2. "
             const textParts = mainContent.split(/(?=\b\d+\.\s)/g).map(p => p.trim()).filter(p => p.length > 0);
             let partIndex = 0;
 
-            // 4. Hàm điều phối chạy hiệu ứng xen kẽ đệ quy
             function renderFlow() {
-                // Bước A: Nếu còn phần text mô tả sản phẩm
                 if (partIndex < textParts.length) {
                     const currentText = textParts[partIndex];
 
@@ -249,8 +275,6 @@
                     container.appendChild(textSpan);
 
                     typeWriterEffect(textSpan, currentText, 10, () => {
-
-                        // Bước B: Chạy xong chữ thì kiểm tra và render Card tương ứng
                         if (data.products && data.products[partIndex]) {
                             const p = data.products[partIndex];
 
@@ -259,7 +283,6 @@
                             listWrapper.style.margin = "4px 0 10px 0";
                             container.appendChild(listWrapper);
 
-                            // Hiển thị Skeleton quét sáng trước
                             const skeletonItem = document.createElement('div');
                             skeletonItem.className = "product-list-item skeleton-product";
                             skeletonItem.innerHTML = `
@@ -272,7 +295,6 @@
                             listWrapper.appendChild(skeletonItem);
                             chatBody.scrollTop = chatBody.scrollHeight;
 
-                            // Nạp data thật sau 600ms quét sáng
                             setTimeout(() => {
                                 skeletonItem.classList.remove('skeleton-product');
                                 skeletonItem.style.cursor = 'pointer';
@@ -285,26 +307,23 @@
                                     </div>
                                     <div class="product-list-arrow">➤</div>
                                 `;
-
                                 setTimeout(() => { skeletonItem.classList.add('visible'); }, 30);
                                 chatBody.scrollTop = chatBody.scrollHeight;
 
-                                // Chuyển tiếp sang xử lý khối sản phẩm sau
                                 partIndex++;
                                 setTimeout(renderFlow, 400);
                             }, 600);
 
                         } else {
-                            // Nếu không có card đi kèm text này, bỏ qua và lặp tiếp
                             partIndex++;
                             setTimeout(renderFlow, 200);
                         }
                     });
                 }
-                // Bước C: Sau khi chạy hết loạt sản phẩm, hiển thị câu chào hỏi kết thúc ở cuối cùng
                 else if (finalAsk) {
                     const finalSpan = document.createElement('span');
                     finalSpan.style.whiteSpace = "pre-line";
+                    finalSpan.style.display = "block";
                     finalSpan.style.marginTop = "8px";
                     finalSpan.style.borderTop = "1px dashed #e2e8f0";
                     finalSpan.style.paddingTop = "10px";
@@ -316,8 +335,6 @@
                     finalAsk = "";
                 }
             }
-
-            // Kích hoạt luồng chạy
             renderFlow();
 
         } catch (err) {
@@ -348,6 +365,7 @@
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
+    // Tự động gọi đồng bộ lịch sử chat cũ ngay khi trang web tải xong
     document.addEventListener('DOMContentLoaded', loadHistory);
 </script>
 
@@ -798,4 +816,133 @@
             background: linear-gradient(135deg, #e6870d, #cc780b);
             transform: scale(1.03);
         }
+
+    /* ================= BANNER AI BONG BÓNG PRO ================= */
+    #chat-bubble.ai-pro-bubble {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1.5px solid rgba(254, 152, 15, 0.4);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 9999;
+        box-shadow: 0 8px 32px 0 rgba(254, 152, 15, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+        /* Hiệu ứng phóng to & Đổi màu Gradient khi di chuột vào */
+        #chat-bubble.ai-pro-bubble:hover {
+            transform: scale(1.1) translateY(-5px);
+            border-color: rgba(254, 152, 15, 0.9);
+            background: linear-gradient(135deg, rgba(255,179,71,0.2), rgba(254,152,15,0.3));
+            box-shadow: 0 12px 40px 0 rgba(254, 152, 15, 0.45), 0 0 20px rgba(254, 152, 15, 0.3);
+        }
+
+    /* Lõi chứa Icon SVG định hình */
+    .ai-core-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3;
+        transition: transform 0.4s ease;
+    }
+
+    #chat-bubble.ai-pro-bubble:hover .ai-core-icon {
+        transform: rotate(45deg) scale(1.05);
+    }
+
+    /* Vòng tròn sóng quét phát sáng lan tỏa ra ngoài (Pulse) */
+    .ai-pulse-ring {
+        position: absolute;
+        top: -1.5px;
+        left: -1.5px;
+        right: -1.5px;
+        bottom: -1.5px;
+        border: 2px solid #FE980F;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: aiPulse 2.5s cubic-bezier(0.25, 0, 0, 1) infinite;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+        .ai-pulse-ring.delay {
+            animation-delay: 1.25s;
+        }
+
+    /* Nhấp nháy tâm AI */
+    .ai-dot-blink {
+        animation: aiDotFade 2s infinite ease-in-out;
+    }
+
+    .ai-status-badge {
+        position: absolute;
+        bottom: -10px;
+        background: linear-gradient(135deg, #2d3748, #1a202c);
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 1px solid rgba(254, 152, 15, 0.3);
+        white-space: nowrap;
+        z-index: 4;
+    }
+
+    .badge-dot {
+        width: 5px;
+        height: 5px;
+        background-color: #2ecc71;
+        border-radius: 50%;
+        box-shadow: 0 0 6px #2ecc71;
+        animation: aiDotFade 1.5s infinite;
+    }
+
+    /* ================= HỆ THỐNG ANIMATION (KEYFRAMES) ================= */
+    @@keyframes aiPulse {
+        0%
+
+    {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
+    }
+
+    }
+
+   @@keyframes aiDotFade {
+        0%, 100%
+
+    {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    }
 </style>
