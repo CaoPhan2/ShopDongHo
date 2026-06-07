@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopDongHo.Repository;
 
@@ -11,9 +12,11 @@ using ShopDongHo.Repository;
 namespace ShopDongHo.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20260605055735_AddAddressToContact")]
+    partial class AddAddressToContact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -321,34 +324,6 @@ namespace ShopDongHo.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ChatHistory");
-                });
-
-            modelBuilder.Entity("ShopDongHo.Models.ChatSessionContext", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("LastBrand")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastCategory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long?>("LastProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("SessionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ChatSessionContexts");
                 });
 
             modelBuilder.Entity("ShopDongHo.Models.CompareModel", b =>

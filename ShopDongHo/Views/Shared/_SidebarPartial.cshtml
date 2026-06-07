@@ -72,7 +72,111 @@
 
     </div>
 
+    <vc:bestseller></vc:bestseller>
+
+    <div class="coupon-container">
+        <div class="coupon-header">
+            <h3>MÃ GIẢM GIÁ CHO BẠN</h3>
+            <p>Nhận mã giảm giá ngay hôm nay!</p>
+        </div>
+
+        <div class="coupon-list">
+            
+            @if(ViewBag.Coupons != null)
+            {
+                foreach(var coupon in ViewBag.Coupons)
+                {
+                    <div class="coupon-card">
+                        <div class="coupon-value">@coupon.DiscountPercent%<br>GIẢM</div>
+                        <div class="coupon-info">
+                            <strong>@coupon.Code</strong>
+                            <small>HSD: @coupon.DateExpired.ToString("dd/MM/yyyy")</small>
+                        </div>
+                        <button class="get-code-btn">LẤY MÃ</button>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="view-all-coupons">
+            <a href="#">Xem tất cả mã giảm giá</a>
+        </div>
+    </div>
+
 </div>
 <style>
-	
+    .coupon-container {
+        width: 330px;
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        margin-top: 20px;
+    }
+
+    .coupon-header h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #333;
+    }
+
+    .coupon-header p {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .coupon-card {
+        display: flex;
+        align-items: center;
+        border: 1px dashed #c5a059;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+
+    .coupon-value {
+        color: #c5a059;
+        font-weight: bold;
+        text-align: center;
+        min-width: 60px;
+    }
+
+    .coupon-info {
+        flex-grow: 1;
+        margin: 0 10px;
+        font-size: 12px;
+    }
+
+        .coupon-info strong {
+            display: block;
+            color: #333;
+        }
+
+    .get-code-btn {
+        background: #c5a059;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 11px;
+        border-radius: 3px;
+    }
+
+        .get-code-btn:hover {
+            background: #a88545;
+        }
+
+    .view-all-coupons {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+        .view-all-coupons a {
+            font-size: 12px;
+            color: #c5a059;
+            text-decoration: none;
+        }
+
 </style>

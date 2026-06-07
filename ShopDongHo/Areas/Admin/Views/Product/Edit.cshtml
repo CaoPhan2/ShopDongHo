@@ -8,52 +8,60 @@
 
 <div class="wrapper">
     <div class="form-card">
-        <h2>Update Product</h2>
+        <h2>Sửa thông tin sản phẩm</h2>
 
         <form asp-action="Edit" asp-controller="Product" enctype="multipart/form-data">
             <input type="hidden" asp-for="Id" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
            
             <div class="form-group">
-                <label>Name</label>
+                <label>Tên sản phẩm</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label>Price</label>
+                <label>Giá</label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label>Capital Price</label>
+                <label>Giá nhập</label>
                 <input asp-for="CapitalPrice" class="form-control" />
                 <span asp-validation-for="CapitalPrice" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
+            @* <div class="form-group">
                 <label>Description</label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+            </div> *@
 
             <div class="form-group">
-                <label>Category</label>
+                <label>Danh mục</label>
                 <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
-                    <option value="">-- Choose category --</option>
+                    <option value="">-- Chọn danh mục --</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>Brand</label>
+                <label>Thương hiệu</label>
                 <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brands">
-                    <option value="">-- Choose brand --</option>
+                    <option value="">-- Chọn thương hiệu --</option>
                 </select>
             </div>
-
             <div class="form-group">
-                <label>Image</label>
+                <label>Mô tả</label>
+                <textarea asp-for="Description" id="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <button type="button" id="btnGenerateDescription" class="btn btn-primary mt-2">
+                    Tạo mô tả bằng AI
+                </button>
+
+            </div>
+            <div class="form-group">
+                <label>Hình ảnh</label>
                 <input asp-for="ImageUpload" type="file" class="form-control" />
 
                 <img src="~/media/products/@Model.Images"
@@ -61,10 +69,10 @@
                      class="preview-img" />
             </div>
 
-            <button class="btn-submit">Update Product</button>
+            <button class="btn-submit">Cập nhật sản phẩm</button>
         </form>
 
-        <a asp-action="Index" class="back-link">← Back to list</a>
+        <a asp-action="Index" class="back-link">← Quay lại danh sách</a>
     </div>
 </div>
 
@@ -76,6 +84,41 @@
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <script>
         CKEDITOR.replace('Description');
+    </script>
+    <script>
+        $("#btnGenerateDescription").click(function () {
+
+            let btn = $(this);
+
+            btn.prop("disabled", true);
+            btn.text("AI đang viết...");
+
+            $.ajax({
+                url: "/Admin/Product/GenerateDescription",
+                type: "POST",
+                data: {
+                    name: $("#Name").val(),
+                    price: $("#Price").val(),
+                    category: $("#CategoryId option:selected").text(),
+                    brand: $("#BrandId option:selected").text(),
+                    extraInfo: $("#ExtraInfo").val()
+                },
+                success: function (res) {
+
+                    CKEDITOR.instances['Description'].setData(res.description);
+
+                    btn.prop("disabled", false);
+                    btn.text("Tạo mô tả bằng AI");
+                },
+                error: function () {
+
+                    alert("Không thể kết nối AI");
+
+                    btn.prop("disabled", false);
+                    btn.text("Tạo mô tả bằng AI");
+                }
+            });
+        });
     </script>
 }
 

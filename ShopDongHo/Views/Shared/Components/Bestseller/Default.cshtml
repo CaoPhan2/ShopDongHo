@@ -1,0 +1,172 @@
+﻿@model IEnumerable<ProductModel>
+@{
+    int rank = 1;
+}
+<div class="best-seller-widget">
+    <div class="widget-title">
+        <i class="fa-solid fa-fire"></i>
+        Sản phẩm bán chạy
+    </div>
+
+    @foreach (var item in Model)
+    {
+        <a asp-controller="Product"
+           asp-action="Details"
+           asp-route-id="@item.Id"
+           class="best-item">
+            <img src="~/media/products/@item.Images" alt="@item.Name" />
+            <div class="info">
+                <div class="product-name">@item.Name</div>
+                <div class="meta">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    Đã bán @item.Sold
+                </div>
+                <div class="price">
+                    @item.Price.ToString("#,##0")đ
+                </div>
+            </div>
+            <div class="rank">@rank</div>
+        </a>
+        rank++;
+    }
+
+    <a class="view-all">
+        <i class="fa-solid fa-bag-shopping"></i>
+        Xem tất cả sản phẩm
+    </a>
+</div>
+<style>
+    .best-seller-widget {
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+        border: 1px solid #eee;
+    }
+
+    /* TITLE */
+    .widget-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        padding-bottom: 12px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #f2f2f2;
+    }
+
+        .widget-title i {
+            color: #f5a623;
+        }
+
+    .best-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f4f4f4;
+        position: relative;
+    }
+    .best-item:hover {
+            opacity: 0.8;
+    }
+
+    
+
+        .best-item:last-child {
+            border-bottom: none;
+        }
+
+        /* IMAGE */
+        .best-item img {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+    .info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+       
+    }
+
+    /* NAME */
+    .product-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #222;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 180px;
+    }
+
+    
+
+    /* SOLD */
+    .meta {
+        font-size: 12px;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .meta i {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+    /* PRICE */
+    .info .price {
+        font-size: 14px;
+        font-weight: 700;
+        color: #f5a623;
+        margin-bottom: 10px;
+    }
+
+    /* RANK CIRCLE */
+    .rank {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #f3f3f3;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* BUTTON */
+    .view-all {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 12px;
+        padding: 10px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        font-size: 13px;
+        color: #333;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .view-all:hover {
+            background: #fafafa;
+            border-color: #ddd;
+        }
+</style>

@@ -77,6 +77,9 @@ builder.Services.AddHttpClient("Ollama", client => {
     client.Timeout = TimeSpan.FromSeconds(60);
 });
 
+// register image search service that depends on Ollama named client
+builder.Services.AddScoped<IImageSearchService, ImageSearchService>();
+
 var app = builder.Build();
 
 app.UseStatusCodePagesWithRedirects("/Home/Error?statuscode={0}");
@@ -105,6 +108,11 @@ app.MapControllerRoute(
     name: "category",
     pattern: "/category/{slug?}",
     defaults : new {controller = "Category", action="Index"}
+);
+app.MapControllerRoute(
+    name: "ImageSearch",
+    pattern: "ImageSearch/{action=Search}",
+    defaults: new { controller = "ImageSearch", action = "Search" }
 );
 app.MapControllerRoute(
     name: "brand",

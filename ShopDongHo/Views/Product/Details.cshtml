@@ -16,30 +16,9 @@
 						 width="100%"
 						 onerror="this.onerror=null; this.src='@Url.Content("~/images/no-image.jpg")';" />
 					
-					@* <h3>ZOOM</h3> *@
+				
 				</div>
-				@* <div id="similar-product" class="carousel slide" data-ride="carousel">
-
-					<!-- Wrapper for slides -->
-					<div class="carousel-inner">
-						<div class="item active">
-							<a href=""><img src="images/product-details/similar1.jpg" alt=""></a>
-							<a href=""><img src="images/product-details/similar2.jpg" alt=""></a>
-							<a href=""><img src="images/product-details/similar3.jpg" alt=""></a>
-						</div>
-						
-
-					</div>
-
-					<!-- Controls -->
-					<a class="left item-control" href="#similar-product" data-slide="prev">
-						<i class="fa fa-angle-left"></i>
-					</a>
-					<a class="right item-control" href="#similar-product" data-slide="next">
-						<i class="fa fa-angle-right"></i>
-					</a>
-				</div> *@
-
+				
 			</div>
 			<div class="col-sm-7">
 				<div class="product-detail">
@@ -101,7 +80,7 @@
 							}
 
 							<a class="btn-buy" data-product_id="@Model.ProductDetails.Id" asp-controller="Checkout"
-							   asp-action="Checkout">Mua ngay</a>
+							   asp-action="Index">Mua ngay</a>
 						</div>
 
 						
@@ -117,7 +96,7 @@
 				<ul class="nav nav-tabs">
 					<li><a href="#details" data-toggle="tab">Thông tin sản phẩm</a></li>
 					<li><a href="#tag" data-toggle="tab">Hướng dẫn chọn size</a></li>
-					<li class="active"><a href="#reviews" data-toggle="tab">Đánh giá (5)</a></li>
+					<li class="active"><a href="#reviews" data-toggle="tab">Bình Luận</a></li>
 				</ul>
 			</div>
 			<div class="tab-content">
@@ -146,7 +125,7 @@
 								<li><a href=""><i class="fa fa-calendar-o"></i>31 DEC 2014</a></li>
 							</ul>
 
-							<p><b>Viết đánh giá</b></p>
+							<p><b>Viết Bình Luận</b></p>
 
 							<form autocomplete="off" asp-action="CommentProduct" asp-controller="Product">
 
@@ -193,7 +172,7 @@
 
 								<button type="submit"
 										class="btn btn-default">
-									Gửi đánh giá
+									Gửi bình luận
 								</button>
 
 							</form>
@@ -202,7 +181,7 @@
 					<div class="col-sm-6">
 						<div class="review-wrapper">
 
-							<h3>Đánh giá của khách hàng:</h3>
+							<h3>Bình luận của khách hàng:</h3>
 
 							<div class="review-list">
 								@if (Model.ProductDetails.Ratings != null && Model.ProductDetails.Ratings.Any())
@@ -236,8 +215,8 @@
 								}
 								else
 								{
-                                    <p>Chưa có đánh giá nào cho sản phẩm này.</p>
-									<p>Hãy trở thành người đầu tiên đánh giá sản phẩm!</p>
+                                    <p>Chưa có bình luận nào cho sản phẩm này.</p>
+									<p>Hãy trở thành người đầu tiên bình luận sản phẩm!</p>
 								}
 							</div>
 

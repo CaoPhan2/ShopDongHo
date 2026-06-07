@@ -92,7 +92,7 @@ namespace ShopDongHo.Controllers
             ViewBag.Reviews = reviews;
             //Viewbag dùng dropmenu
             ViewBag.Categories = _dataContext.Categories.ToList();
-
+            ViewBag.Coupons = _dataContext.Coupons.Where(c => c.DateExpired > DateTime.Now).ToList();
             return View(data);
         }
         public IActionResult Privacy()
