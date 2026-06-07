@@ -25,5 +25,6 @@ namespace ShopDongHo.Repository
         public DbSet<StatisticalModel> Statisticals { get; set; }
         public DbSet<VnPayModel> VnInfors { get; set; }
         public DbSet<ChatHistory> ChatHistory { get; set; }
+        public DbSet<ChatSessionContext> ChatSessionContexts { get; set; }
     }
 }

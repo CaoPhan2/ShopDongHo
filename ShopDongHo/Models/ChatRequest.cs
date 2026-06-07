@@ -18,9 +18,17 @@ namespace ShopDongHo.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public string BrandName { get; set; } // Phải có dòng này để chứa tên thương hiệu truyền xuống Frontend
+        public string BrandName { get; set; }
         public decimal Price { get; set; }
         public string ImageUrl { get; set; }
         public string Url { get; set; }
+
+        // Dữ liệu mở rộng để AI đọc và bóc tách đồng bộ
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public int Sold { get; set; }
+
+        // === THÊM DÒNG NÀY VÀO ĐỂ HẾT BÁO LỖI ===
+        public string ShortDescription { get; set; }
     }
 }
