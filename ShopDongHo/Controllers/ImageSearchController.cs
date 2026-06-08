@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using ShopDongHo.Models;
 using ShopDongHo.Repository;
+using ShopDongHo.Services;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,95 +15,77 @@ namespace ShopDongHo.Controllers
     public class ImageSearchController : Controller
     {
         private readonly DataContext _context;
-        private readonly ShopDongHo.Services.IImageSearchService _imageSearchService;
+        private readonly IImageSearchService _imageSearchService;
         private readonly ILogger<ImageSearchController> _logger;
 
-        public ImageSearchController(DataContext context, ShopDongHo.Services.IImageSearchService imageSearchService, ILogger<ImageSearchController> logger)
+        public ImageSearchController(DataContext context, IImageSearchService imageSearchService, ILogger<ImageSearchController> logger)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _imageSearchService = imageSearchService ?? throw new ArgumentNullException(nameof(imageSearchService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _context = context;
+            _imageSearchService = imageSearchService;
+            _logger = logger;
         }
-
         [HttpPost("Search")]
         [RequestSizeLimit(20_000_000)]
-        public async Task<IActionResult> Search(IFormFile image)
+        public async Task<IActionResult> Search(IFormFile image, string keyWord)
         {
+            _logger.LogInformation("[CONTROLLER-LOG 1] Hệ thống nhận được yêu cầu tìm kiếm bằng ảnh từ Client.");
+            _logger.LogInformation("[CONTROLLER-LOG 1.1] Từ khóa chữ đi kèm (nếu có): '{KeyWord}'", keyWord);
+
             if (image == null || image.Length == 0)
-                return Json(new { success = false, message = "Kh�ng c� ?nh ???c t?i l�n" });
-
-            // Save uploaded file to wwwroot/uploads for inspection
-            string saveRelative = null;
-            try
             {
-                var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                if (!Directory.Exists(uploadsDir)) Directory.CreateDirectory(uploadsDir);
-
-                var fileName = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss_") + Path.GetRandomFileName() + Path.GetExtension(image.FileName);
-                var savePath = Path.Combine(uploadsDir, fileName);
-                await using (var fs = new FileStream(savePath, FileMode.Create))
-                {
-                    await image.CopyToAsync(fs);
-                }
-                saveRelative = $"/uploads/{fileName}";
-                _logger.LogInformation("ImageSearch: saved uploaded image to {Path} ({Bytes} bytes)", savePath, image.Length);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "ImageSearch: failed to save uploaded image");
+                _logger.LogWarning("[CONTROLLER-LOG 1.2] Không tìm thấy file ảnh đính kèm. Chuyển hướng sang tìm kiếm chữ thông thường.");
+                return RedirectToAction("Search", "Product", new { keyWord = keyWord });
             }
 
             try
             {
-                var keywords = await _imageSearchService.ExtractKeywordsFromImageAsync(image);
+                _logger.LogInformation("[CONTROLLER-LOG 2] Đang chuyển tiếp ảnh qua ImageSearchService...");
+                var aiKeywords = await _imageSearchService.ExtractKeywordsFromImageAsync(image);
 
-                // TH�M D�NG N�Y ?? DEBUG
-                _logger.LogInformation("S? l??ng t? kh�a tr�ch xu?t ???c: {Count}", keywords?.Count ?? 0);
-                if (keywords != null)
+                _logger.LogInformation("[CONTROLLER-LOG 3] Service phản hồi kết quả về cho Controller.");
+
+                if (aiKeywords == null || aiKeywords.Count == 0)
                 {
-                    _logger.LogInformation("Danh s�ch t? kh�a: {List}", string.Join(", ", keywords));
+                    _logger.LogWarning("[CONTROLLER-LOG 3.1] Mảng từ khóa trả về rỗng (0 phần tử). Kích hoạt TempData lỗi.");
+                    TempData["error"] = "KHONG NHAN DIEN DUOC HINH ẢNH TU AI .";
+                    return RedirectToAction("Index", "Home");
                 }
 
-                if (keywords == null || keywords.Count == 0)
+                _logger.LogInformation("[CONTROLLER-LOG 4] Bắt đầu gộp từ khóa AI và từ khóa của người dùng để quét Database.");
+                var searchTerms = aiKeywords.Select(k => k.ToLower()).ToList();
+
+                if (!string.IsNullOrEmpty(keyWord))
                 {
-                    return Json(new { success = false, message = "Kh�ng t�m ???c t? kh�a t? ?nh", saved = saveRelative });
+                    var userTerms = keyWord.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    searchTerms.AddRange(userTerms);
                 }
 
-                var lowered = keywords.Select(k => k.ToLower()).ToList();
+                searchTerms = searchTerms.Distinct().Where(t => t.Length > 1).ToList();
+                _logger.LogInformation("[CONTROLLER-LOG 4.1] Các từ khóa cuối cùng dùng để quét SQL: [{Terms}]", string.Join(" | ", searchTerms));
 
-                var matched = await _context.Products
-                    .AsNoTracking()
-                    .Include(p => p.Brand)
-                    .Include(p => p.Category)
-                    .Where(p =>
-                        lowered.Any(kw =>
-                            (p.Name != null && p.Name.ToLower().Contains(kw)) ||
-                            (p.Brand != null && p.Brand.Name != null && p.Brand.Name.ToLower().Contains(kw)) ||
-                            (p.Category != null && p.Category.Name != null && p.Category.Name.ToLower().Contains(kw))
-                        )
-                    )
-                    .Take(30)
-                    .ToListAsync();
+                // Tiến hành Query Database
+                var query = _context.Products.AsNoTracking().Include(p => p.Brand).Include(p => p.Category).AsQueryable();
 
-                var results = matched.Select(p => new
-                {
-                    id = p.Id,
-                    name = p.Name,
-                    price = $"{p.Price:N0}?",
-                    image = string.IsNullOrEmpty(p.Images) ? "no-image.jpg" : p.Images.Trim(),
-                    brand = p.Brand?.Name,
-                    url = Url.Action("Details", "Product", new { id = p.Id })
-                }).ToList();
+                query = query.Where(p => searchTerms.Any(term =>
+                    (p.Name != null && p.Name.ToLower().Contains(term)) ||
+                    (p.Description != null && p.Description.ToLower().Contains(term)) ||
+                    (p.Brand != null && p.Brand.Name != null && p.Brand.Name.ToLower().Contains(term)) ||
+                    (p.Category != null && p.Category.Name != null && p.Category.Name.ToLower().Contains(term))
+                ));
 
-                // Log matched count
-                _logger.LogInformation("ImageSearch: matched {Count} products for keywords {Keywords}", results.Count, string.Join(",", keywords));
+                var products = await query.Take(30).ToListAsync();
+                _logger.LogInformation("[CONTROLLER-LOG 5] Quét DB hoàn tất. Tìm thấy {Count} sản phẩm khớp.", products.Count);
 
-                return Json(new { success = true, reply = $"T? kh�a: {string.Join(", ", keywords)}", products = results, saved = saveRelative });
+                ViewBag.keyword = string.Join(", ", aiKeywords) + (!string.IsNullOrEmpty(keyWord) ? $" + {keyWord}" : "");
+
+                _logger.LogInformation("[CONTROLLER-LOG 6] Đang render dữ liệu ra giao diện View Product/Search.cshtml");
+                return View("~/Views/Product/Search.cshtml", products);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "ImageSearch failed");
-                return Json(new { success = false, message = "L?i h? th?ng: " + ex.Message, saved = saveRelative });
+                _logger.LogError(ex, "[CONTROLLER-LOG EXCEPTION] Lỗi hệ thống tại ImageSearchController.");
+                TempData["error"] = "Hệ thống tìm kiếm bằng ảnh gặp sự cố.";
+                return RedirectToAction("Index", "Home");
             }
         }
     }
