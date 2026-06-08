@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,58 +27,109 @@ namespace ShopDongHo.Services
 
         public async Task<List<string>> ExtractKeywordsFromImageAsync(IFormFile image)
         {
+            _logger.LogInformation("[AI-LOG 1] Bắt đầu quá trình xử lý ảnh tại Service.");
+
+            if (image == null || image.Length == 0)
+            {
+                _logger.LogWarning("[AI-LOG 1.1] File ảnh truyền vào bị rỗng hoặc NULL.");
+                return new List<string>();
+            }
+
             try
             {
-                // 1. Chuy?n ?nh sang Base64
+                // 1. Log thông tin file nhận được
+                _logger.LogInformation("[AI-LOG 2] Nhận file: {FileName} | Kích thước: {Length} bytes | Định dạng: {ContentType}",
+                    image.FileName, image.Length, image.ContentType);
+
+                // 2. Chuyển ảnh sang Base64
                 using var ms = new MemoryStream();
                 await image.CopyToAsync(ms);
                 string base64Image = Convert.ToBase64String(ms.ToArray());
+                _logger.LogInformation("[AI-LOG 3] Chuyển đổi Base64 thành công. Độ dài chuỗi mã hóa: {Base64Length} ký tự.", base64Image.Length);
 
-                // 2. C?u h�nh URL API Google Gemini 1.5 Flash
-                string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}";
+                // 3. Kiểm tra API Key
+                if (string.IsNullOrEmpty(_apiKey))
+                {
+                    _logger.LogError("[AI-LOG CRITICAL] API Key của Gemini đang bị trống! Vui lòng kiểm tra file appsettings.json.");
+                    return new List<string>();
+                }
+                _logger.LogInformation("[AI-LOG 4] Đã tìm thấy API Key (Độ dài: {KeyLength}). Chuẩn bị gọi API Google...", _apiKey.Length);
 
-                // 3. T?o Payload g?i cho Gemini
+                // 4. Cấu hình URL và Payload
+                string url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={_apiKey}";
                 var payload = new
                 {
                     contents = new[] {
-                        new {
-                            parts = new object[] {
-                                new { text = "Identify this watch. Return ONLY a comma-separated list of keywords: Brand, Model. No sentences, no markdown." },
-                                new { inline_data = new { mime_type = "image/jpeg", data = base64Image } }
-                            }
-                        }
+                new {
+                    parts = new object[] {
+new { text = "Identify this watch. Return ONLY a comma-separated list of keywords in Vietnamese: Brand, Model, Style. No sentences, no markdown. If the image does not contain any watch, return ONLY the word 'NONE'." },
+                        new { inlineData = new { mimeType = image.ContentType, data = base64Image } }
                     }
+                }
+            }
                 };
 
-                // 4. G?i y�u c?u qua HttpClient
+                // 5. Gửi request
+                _logger.LogInformation("[AI-LOG 5] Đang gửi HTTP POST tới Google Gemini API...");
                 var response = await _httpClient.PostAsJsonAsync(url, payload);
+
+                // 6. ĐỌC DỮ LIỆU THÔ (RAW) TRƯỚC KHI PARSE - Bước này giúp bắt mọi loại lỗi của Google
+                string rawJsonResponse = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation("[AI-LOG 6] Đã nhận phản hồi từ Google. HTTP Status Code: {StatusCode}", response.StatusCode);
+                _logger.LogInformation("[AI-LOG 7] Dữ liệu thô (Raw JSON) nhận được từ Google:\n{RawJson}", rawJsonResponse);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogWarning("Gemini API l?i: {StatusCode}", response.StatusCode);
+                    _logger.LogError("[AI-LOG ERROR] Google Gemini từ chối yêu cầu. Mã lỗi: {StatusCode}. Xem chi tiết ở Log 7 phía trên.", response.StatusCode);
                     return new List<string>();
                 }
 
-                // 5. ??c v� tr�ch xu?t JSON
-                var jsonDoc = await response.Content.ReadFromJsonAsync<JsonElement>();
+                // 7. Phân tích cú pháp JSON khi thành công
+                using JsonDocument jsonDoc = JsonDocument.Parse(rawJsonResponse);
 
-                string text = jsonDoc.GetProperty("candidates")[0]
-                                     .GetProperty("content")
-                                     .GetProperty("parts")[0]
-                                     .GetProperty("text")
-                                     .GetString();
+                // Kiểm tra xem cấu trúc JSON có đúng như mong đợi không
+                if (jsonDoc.RootElement.TryGetProperty("candidates", out JsonElement candidates) && candidates.GetArrayLength() > 0)
+                {
+                    string text = candidates[0]
+              .GetProperty("content")
+              .GetProperty("parts")[0]
+              .GetProperty("text")
+              .GetString();
 
-                _logger.LogInformation("Gemini AI tr? v?: {Text}", text);
-                _logger.LogInformation("?? d�i chu?i base64: {Length}", base64Image.Length);
-                // 6. X? l� k?t qu? tr? v? th�nh List
-                return text.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                           .Select(s => s.Trim())
-                           .Where(s => s.Length > 1)
-                           .ToList();
+                    _logger.LogInformation("[AI-LOG 8] Phân tích JSON thành công. Chữ AI trả về gốc: \"{Text}\"", text);
+
+                    if (string.IsNullOrEmpty(text)) return new List<string>();
+
+                    // ==================== ĐOẠN THÊM MỚI ĐỂ CHẶN ẢNH RÁC / KHÔNG PHẢI ĐỒNG HỒ ====================
+                    string lowerText = text.ToLower();
+                    if (lowerText.Contains("không có") ||
+                        lowerText.Contains("không phải") ||
+                        lowerText.Contains("unknown") ||
+                        lowerText.Contains("none"))
+                    {
+                        _logger.LogWarning("[AI-LOG 8.2] Phát hiện ảnh không hợp lệ hoặc không chứa đồng hồ. Trả về mảng rỗng.");
+                        return new List<string>(); // Trả về rỗng để Controller báo lỗi ra giao diện cho khách
+                    }
+                    // =========================================================================================
+
+                    // Tách chuỗi thành List từ khóa (Giữ nguyên bên dưới)
+                    var keywords = text.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(s => s.Trim())
+                                       .Where(s => s.Length > 1)
+                                       .ToList();
+
+                    _logger.LogInformation("[AI-LOG 9] Danh sách từ khóa sau khi chuẩn hóa thành mảng: [{Keywords}]", string.Join(", ", keywords));
+                    return keywords;
+                }
+                else
+                {
+                    _logger.LogWarning("[AI-LOG 8.1] Cấu trúc JSON thành công nhưng không tìm thấy thẻ 'candidates'.");
+                    return new List<string>();
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "L?i k?t n?i Gemini API");
+                _logger.LogError(ex, "[AI-LOG EXCEPTION] Gặp lỗi nghiêm trọng trong quá trình xử lý Service!");
                 return new List<string>();
             }
         }

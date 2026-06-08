@@ -63,24 +63,25 @@
 			</nav>
 
 			<div class="header-right">
-				<form asp-controller="Product" asp-action="Search" method="post" class="search-box" id="header-search-form" enctype="multipart/form-data">
-
-					<div class="search-input-container">
-						<div id="input-image-preview-container">
-							<img id="input-mini-preview" src="" alt="preview" />
-							<button type="button" id="remove-preview-btn" title="Xóa ảnh chọn">&times;</button>
+				<div class="header-right">
+					<form asp-controller="Product" asp-action="Search" method="post" class="search-box" id="header-search-form" enctype="multipart/form-data">
+						<div class="search-input-container">
+							<div id="input-image-preview-container" style="display:none;">
+								<img id="input-mini-preview" src="" alt="preview" />
+								<button type="button" id="remove-preview-btn" title="Xóa ảnh chọn">&times;</button>
+							</div>
+							<input type="text" name="keyWord" placeholder="Tìm kiếm..." autocomplete="off" />
 						</div>
 
-						<input type="text" name="keyWord" placeholder="Tìm kiếm..." autocomplete="off" />
-					</div>
+						<button type="button" id="header-image-btn" title="Tìm bằng ảnh">
+							<i class="fa fa-image" aria-hidden="true"></i>
+						</button>
+						<input type="file" id="header-image-input" name="image" accept="image/*" style="display:none" />
 
-					<button type="button" id="header-image-btn" title="Tìm bằng ảnh">
-						<i class="fa fa-image" aria-hidden="true"></i>
-					</button>
-					<input type="file" id="header-image-input" accept="image/*" style="display:none" />
+						<button type="submit" id="search-submit-btn"><i class="fa fa-search"></i></button>
+					</form>
+				</div>
 
-					<button type="submit" id="search-submit-btn"><i class="fa fa-search"></i></button>
-				</form>
 
 				<a asp-controller="Cart" asp-action="Index" title="Giỏ hàng">
 					<i class="fa fa-shopping-cart" style="font-size: 24px"></i>
@@ -186,7 +187,7 @@
 	</script>
 
 	<script>
-		$(document).ready(function () {
+						$(document).ready(function () {
 			const $imgBtn = $('#header-image-btn');
 			const $imgInput = $('#header-image-input');
 			const $searchForm = $('#header-search-form');
@@ -198,43 +199,25 @@
 
 			let selectedImageFile = null;
 
-			if (!$imgBtn.length || !$imgInput.length || !$searchForm.length || !$searchInput.length) return;
+			$imgBtn.on('click', function () { $imgInput.click(); });
 
-			// Mở hộp thoại chọn tệp hệ thống
-			$imgBtn.on('click', function () {
-				$imgInput.click();
-			});
-
-			// Lắng nghe sự kiện sau khi tệp tin hình ảnh được nạp vào
 			$imgInput.on('change', function () {
 				const file = this.files && this.files[0];
 				if (!file) return;
-
 				if (!file.type.startsWith('image/')) {
-					Swal.fire('Sai định dạng', 'Vui lòng chọn một file hình ảnh hợp lệ (jpg, png, webp).', 'warning');
+					Swal.fire('Sai định dạng', 'Vui lòng chọn file ảnh hợp lệ.', 'warning');
 					return;
 				}
-
-				const maxSize = 12 * 1024 * 1024; // Hỗ trợ tối đa 12MB theo cấu hình gốc
-				if (file.size > maxSize) {
-					Swal.fire('File quá lớn', 'Vui lòng chọn hình ảnh có dung lượng nhỏ hơn 12MB.', 'warning');
-					return;
-				}
-
 				selectedImageFile = file;
-
-				// Chuyển đổi dữ liệu ảnh để hiển thị mini-thumbnail trong lòng input
 				const reader = new FileReader();
 				reader.onload = function (e) {
 					$miniPreview.attr('src', e.target.result);
 					$previewContainer.css('display', 'flex');
-					$searchInput.attr('placeholder', 'Thêm từ khóa bổ sung...');
-					$searchInput.focus();
+					$searchInput.attr('placeholder', 'Thêm từ khóa bổ sung (màu sắc, dây...)...');
 				};
 				reader.readAsDataURL(file);
 			});
 
-			// Nhấn dấu X để hủy chọn hình ảnh
 			$removePreviewBtn.on('click', function (e) {
 				e.stopPropagation();
 				selectedImageFile = null;
@@ -244,37 +227,15 @@
 				$searchInput.attr('placeholder', 'Tìm kiếm...');
 			});
 
-			// Kiểm soát hành vi khi form thực hiện gửi dữ liệu (Submit)
-					$searchForm.on('submit', async function (e) {
-			if (!selectedImageFile) return; // Nếu không có ảnh, để form submit bình thường
-
-			e.preventDefault();
-			$loadingOverlay.fadeIn(200);
-
-			const formData = new FormData();
-			formData.append('image', selectedImageFile);
-			formData.append('keyWord', $searchInput.val()); // Gửi thêm từ khóa text
-
-			try {
-				const resp = await fetch('/ImageSearch/Search', {
-					method: 'POST',
-					body: formData
-				});
-
-				const data = await resp.json();
-				$loadingOverlay.fadeOut(200);
-
-				if (data.success) {
-					$searchInput.val(data.keywords);
-					$searchForm.off('submit').submit(); // Submit lại form với từ khóa đã update
+			// Thay đổi action linh hoạt khi submit form gửi lên Server
+			$searchForm.on('submit', function () {
+				if (selectedImageFile) {
+					$searchForm.attr('action', '/ImageSearch/Search');
+					$loadingOverlay.fadeIn(200);
 				} else {
-					Swal.fire('Thông báo', data.message, 'warning');
+					$searchForm.attr('action', '/Product/Search');
 				}
-			} catch (err) {
-				$loadingOverlay.fadeOut(200);
-				Swal.fire('Lỗi', 'Không thể kết nối tới server.', 'error');
-			}
-		});
+			});
 		});
 	</script>
 
