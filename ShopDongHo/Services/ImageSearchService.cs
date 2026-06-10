@@ -73,7 +73,7 @@ new { text = "Identify this watch. Return ONLY a comma-separated list of keyword
                 _logger.LogInformation("[AI-LOG 5] Đang gửi HTTP POST tới Google Gemini API...");
                 var response = await _httpClient.PostAsJsonAsync(url, payload);
 
-                // 6. ĐỌC DỮ LIỆU THÔ (RAW) TRƯỚC KHI PARSE - Bước này giúp bắt mọi loại lỗi của Google
+                // 6. ĐỌC DỮ LIỆU THÔ (RAW) TRƯỚC KHI PARSE - giúp bắt mọi loại lỗi của Google
                 string rawJsonResponse = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation("[AI-LOG 6] Đã nhận phản hồi từ Google. HTTP Status Code: {StatusCode}", response.StatusCode);
                 _logger.LogInformation("[AI-LOG 7] Dữ liệu thô (Raw JSON) nhận được từ Google:\n{RawJson}", rawJsonResponse);
@@ -87,7 +87,7 @@ new { text = "Identify this watch. Return ONLY a comma-separated list of keyword
                 // 7. Phân tích cú pháp JSON khi thành công
                 using JsonDocument jsonDoc = JsonDocument.Parse(rawJsonResponse);
 
-                // Kiểm tra xem cấu trúc JSON có đúng như mong đợi không
+
                 if (jsonDoc.RootElement.TryGetProperty("candidates", out JsonElement candidates) && candidates.GetArrayLength() > 0)
                 {
                     string text = candidates[0]
@@ -100,7 +100,7 @@ new { text = "Identify this watch. Return ONLY a comma-separated list of keyword
 
                     if (string.IsNullOrEmpty(text)) return new List<string>();
 
-                    // ==================== ĐOẠN THÊM MỚI ĐỂ CHẶN ẢNH RÁC / KHÔNG PHẢI ĐỒNG HỒ ====================
+                    // THÊM MỚI ĐỂ CHẶN ẢNH RÁC / KHÔNG PHẢI ĐỒNG HỒ 
                     string lowerText = text.ToLower();
                     if (lowerText.Contains("không có") ||
                         lowerText.Contains("không phải") ||
@@ -110,7 +110,7 @@ new { text = "Identify this watch. Return ONLY a comma-separated list of keyword
                         _logger.LogWarning("[AI-LOG 8.2] Phát hiện ảnh không hợp lệ hoặc không chứa đồng hồ. Trả về mảng rỗng.");
                         return new List<string>(); // Trả về rỗng để Controller báo lỗi ra giao diện cho khách
                     }
-                    // =========================================================================================
+                
 
                     // Tách chuỗi thành List từ khóa (Giữ nguyên bên dưới)
                     var keywords = text.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)

@@ -1,219 +1,337 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using ShopDongHo.Models;
 using ShopDongHo.Repository;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace ShopDongHo.Controllers
 {
-    [Route("Chat")]
     public class ChatController : Controller
     {
         private readonly DataContext _context;
-        private readonly HttpClient _httpClient;
 
-        public ChatController(DataContext context, IHttpClientFactory httpClientFactory)
+        // Khởi tạo HttpClient kèm cấu hình Bypass SSL để tránh lỗi chặn kết nối HTTPS trên Localhost
+        private static readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+        });
+
+        // API KEY 
+        private const string API_KEY = "";
+        //private const string GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-laste:generateContent?key=" + API_KEY;
+        private const string GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
+
+
+        public ChatController(DataContext context)
         {
             _context = context;
-            _httpClient = httpClientFactory.CreateClient();
         }
 
-        [HttpPost("Ask")]
+        [HttpPost]
         public async Task<IActionResult> Ask([FromBody] ChatRequest req)
         {
-            if (req == null || string.IsNullOrEmpty(req.Message))
-                return BadRequest(new { success = false, message = "Tin nhắn trống." });
+            if (req == null || string.IsNullOrWhiteSpace(req.Message))
+            {
+                return Json(new ChatResponse { Reply = "Dạ, C&P Store xin kính chào quý khách! Em có thể giúp gì cho anh/chị hôm nay ạ? 🌸" });
+            }
 
-            string sessionId = string.IsNullOrEmpty(req.SessionId) ? "session_default" : req.SessionId;
+            string userMessage = req.Message.Trim();
+            string userMessageLower = userMessage.ToLower();
 
             try
             {
-                // STEP 1: RETRIEVAL - RAG tinh lọc sản phẩm theo từ khóa để tránh quá tải ngữ cảnh cho AI
-                string userMessage = req.Message.ToLower();
 
-                var query = _context.Products
-                    .Include(p => p.Brand)
-                    .Include(p => p.Category)
-                    .AsQueryable();
-
-                if (userMessage.Contains("rolex"))
+                if (IsGreeting(userMessageLower))
                 {
-                    query = query.Where(p => p.Brand.Name.ToLower().Contains("rolex") || p.Name.ToLower().Contains("rolex"));
-                }
-                else if (userMessage.Contains("casio") || userMessage.Contains("edifice") || userMessage.Contains("g-shock") || userMessage.Contains("vintage"))
-                {
-                    query = query.Where(p => p.Brand.Name.ToLower().Contains("casio") || p.Name.ToLower().Contains("casio"));
-                }
-                else if (userMessage.Contains("seiko"))
-                {
-                    query = query.Where(p => p.Brand.Name.ToLower().Contains("seiko") || p.Name.ToLower().Contains("seiko"));
-                }
-                else if (userMessage.Contains("nữ") || userMessage.Contains("bạn gái") || userMessage.Contains("tặng") || userMessage.Contains("cơm") || userMessage.Contains("ăn"))
-                {
-                    query = query.Where(p => p.Category.Name.ToLower().Contains("nữ") || p.Name.ToLower().Contains("nữ") || p.Category.Name.ToLower().Contains("nam") || p.Name.ToLower().Contains("nam"));
+                    return Json(new ChatResponse
+                    {
+                        Reply = "Dạ, C&P Store em xin chào anh/chị ạ! Chúc anh/chị một ngày tốt lành. Anh/chị đang cần tìm dòng đồng hồ hay phụ kiện dây đeo nào để em hỗ trợ tư vấn tốt nhất ạ? ✨"
+                    });
                 }
 
-                var filteredProducts = await query.Take(10).ToListAsync();
-                if (!filteredProducts.Any())
+                var contact = await _context.Contact.AsNoTracking().FirstOrDefaultAsync();
+                if (IsContactInquiry(userMessageLower))
                 {
-                    filteredProducts = await _context.Products.Include(p => p.Brand).Include(p => p.Category).Take(5).ToListAsync();
+                    string reply = "Dạ, C&P Store xin gửi thông tin liên hệ của cửa hàng để anh/chị tiện ghé qua ạ:\n";
+                    if (contact != null)
+                    {
+                        reply += $"📍 **Địa chỉ:** {contact.Address}\n" +
+                                 $"📞 **Số điện thoại:** {contact.Phone}\n" +
+                                 $"✉️ **Email:** {contact.Email}\n" +
+                                 $"📝 **Thông tin thêm:** {contact.Description}";
+                    }
+                    else
+                    {
+                        reply += "📍 Địa chỉ: [Chưa cập nhật cấu hình hệ thống]\n📞 Hotline: 1900 xxxx";
+                    }
+                    return Json(new ChatResponse { Reply = reply });
                 }
 
-                string productCatalogText = "";
-                foreach (var p in filteredProducts)
+                // lấy dữ liệu từ db
+                var allCategories = await _context.Categories.AsNoTracking().Select(c => c.Name).ToListAsync();
+                var allBrands = await _context.Brands.AsNoTracking().Select(b => b.Name).ToListAsync();
+
+                // Gọi hàm lọc từ khóa thông minh ( ưu tiên Thương hiệu)
+                var matchedProducts = await GetProductContextData(userMessageLower);
+
+                string productContext = "Hiện tại không có sản phẩm cụ thể nào khớp chính xác từ khóa khách hàng tìm kiếm trong kho.";
+                if (matchedProducts.Any())
                 {
-                    productCatalogText += $"[MÃ ID THẬT: {p.Id} | Tên đúng: {p.Name} | Giá: {p.Price:N0}đ | Thương Hiệu đúng: {p.Brand?.Name} | Danh Mục đúng: {p.Category?.Name} | Mô tả gốc: {p.Description}]\n";
+                    var contextData = matchedProducts.Select(p => new {
+                        p.Id,
+                        p.Name,
+                        BrandName = p.Brand?.Name ?? "Chưa rõ",
+                        Price = p.Price,
+                        ImageUrl = p.Images,
+                        Rating = 5,
+                        Url = $"/san-pham/{p.Slug}"
+                    });
+                    productContext = JsonSerializer.Serialize(contextData);
                 }
 
-                var history = await _context.Set<ChatHistory>()
-                    .Where(c => c.SessionId == sessionId)
-                    .OrderByDescending(c => c.CreatedAt).Take(3).OrderBy(c => c.CreatedAt).ToListAsync();
+                // Lấy lịch sử trò chuyện theo SessionId 
+                var history = await _context.ChatHistory
+                    .Where(h => h.SessionId == req.SessionId)
+                    .OrderByDescending(h => h.CreatedAt)
+                    .Take(3)
+                    .OrderBy(h => h.CreatedAt)
+                    .ToListAsync();
 
-                // STEP 2: AUGMENTED - Viết lại Prompt mẫu chuẩn hóa dữ liệu thật (Bỏ ngoặc vuông lửng lơ)
-                string systemPrompt = $@"Bạn là trợ lý bán hàng AI Pro cao cấp và rất duyên dáng tại cửa hàng C&P Store.
-Đây là danh sách sản phẩm ĐANG CÓ THỰC TẾ tại shop:
-{productCatalogText}
-
-QUY TẮC ỨNG XỬ VÀ BỐ CỤC PHẢN HỒI (TUÂN THỦ 100%):
-1. ĐIỀU HƯỚNG THÔNG MINH: Nếu khách hỏi câu không liên quan đến mua bán cửa hàng (ví dụ: rủ đi ăn cơm, hỏi thời tiết, đùa vui, nói chuyện phiếm...), bạn phải trả lời một cách khôn khéo, vui vẻ đáp lễ họ trước, sau đó lập tức lôi kéo họ vào xem hoặc mua sản phẩm phù hợp tại shop. 
-   - Ví dụ: ""Dạ, được ăn cơm cùng anh/chị thì vinh hạnh cho em quá ạ! Mà trước khi đi ăn, anh/chị có muốn tham khảo một mẫu đồng hồ thật thời trang của shop để lên đồ thêm bảnh bao/xinh đẹp không ạ? Em vừa về mẫu này đeo đi tiệc hay đi ăn là hết sảy luôn...""
-
-2. BỐ CỤC GIỚI THIỆU SẢN PHẨM: Khi chọn sản phẩm để tư vấn, bạn PHẢI điền thông tin thật vào đúng cấu trúc mẫu sau (Tuyệt đối không giữ lại các chữ chỉ dẫn nằm trong ngoặc vuông):
-
-### **1.Sản phẩm : Tên_Sản_Phẩm_Thật **
-⌚ Tên sản phẩm: Tên_Sản_Phẩm_Thật
-💰 Giá tiền: Số_Tiền_Thậtđ
-🆔 Mã sản phẩm: ID Số_ID_Thật
-📂 Danh mục: Tên_Danh_Mục_Thật
-📝 Mô tả chi tiết: [Biên soạn đoạn văn mô tả tóm tắt sản phẩm khoảng 80-100 từ dựa trên dữ liệu gốc. Câu văn thu hút người đọc].
-👇 Click thẻ phía dưới để đến sản phẩm chi tiết:
-[CARD_PRODUCT: Số_ID_Thật]
-
-3. CẢNH BÁO QUY CÁCH NGHIÊM NGẶT:
-   - Thẻ ""📂 Danh mục:"" bắt buộc phải xuống hàng nằm riêng biệt, không nằm cùng dòng với mã sản phẩm.
-   - Dòng tiêu đề đầu tiên bắt buộc phải in đậm toàn bộ tên sản phẩm kèm theo giá tiền bằng cách đặt trong cặp dấu sao đôi như mẫu trên.
-   - Tuyệt đối KHÔNG được viết dấu ký tự kết thúc như ### dư thừa sau phần mô tả.
-   - Chỉ dùng số ID THẬT và Tên chính xác có trong danh sách được cấp ở trên.";
-
-                var messages = new List<object> { new { role = "system", content = systemPrompt } };
+                var contentsList = new List<object>();
                 foreach (var h in history)
                 {
-                    messages.Add(new { role = "user", content = h.UserMessage });
-
-                    string cleanReply = h.BotReply ?? "";
-                    if (cleanReply.Contains("[PRODUCTS_DATA]"))
-                    {
-                        cleanReply = cleanReply.Substring(0, cleanReply.IndexOf("[PRODUCTS_DATA]")).Trim();
-                    }
-                    messages.Add(new { role = "assistant", content = cleanReply });
+                    contentsList.Add(new { role = "user", parts = new[] { new { text = h.UserMessage } } });
+                    contentsList.Add(new { role = "model", parts = new[] { new { text = h.BotReply } } });
                 }
-                messages.Add(new { role = "user", content = req.Message });
 
-                // STEP 3: GENERATION
-                var payload = new { model = "qwen2.5:3b", messages = messages, stream = false };
-                var response = await _httpClient.PostAsync("http://localhost:11434/api/chat",
-                    new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+                contentsList.Add(new { role = "user", parts = new[] { new { text = $"[KHO SẢN PHẨM THỰC TẾ TRONG HỆ THỐNG]:\n{productContext}\n\n[TIN NHẮN MỚI CỦA KHÁCH HÀNG]: {userMessage}" } } });
 
+                // SYSTEM INSTRUCTION
+                string storeName = "C&P Store";
+                string categoryContext = string.Join(", ", allCategories);
+                string brandContext = string.Join(", ", allBrands);
+                string systemInstruction = $@"
+                    Bạn là trợ lý AI bán hàng chuyên nghiệp, am hiểu sâu sắc về các dòng sản phẩm của cửa hàng {storeName}.
+
+                    DANH MỤC CÓ SẴN: {categoryContext}
+                    THƯƠNG HIỆU CÓ SẴN: {brandContext}
+                    KHO SẢN PHẨM THỰC TẾ (CHỈ ĐƯỢC DÙNG THÔNG TIN TRONG NÀY, KHÔNG TỰ BỊA GIÁ HAY SẢN PHẨM): {productContext}
+
+                    QUY TẮC PHẢN HỒI (BẮT BUỘC):
+                    1. Luôn tư vấn bằng giọng điệu thân thiện, tự nhiên, lễ phép và chuyên nghiệp (Ví dụ: ""Dạ, shop em xin chào anh/chị ạ..."", ""Dạ anh/chị...""). Cuối câu trả lời luôn có câu hỏi gợi mở để tương tác tiếp với khách.
+                    2. Trình bày danh sách sản phẩm theo định dạng Markdown có số thứ tự. Tên sản phẩm PHẢI in đậm (ví dụ: **Rolex Datejust Nữ**). Các đặc tính nổi bật hoặc mô tả ngắn gọn đi kèm phải viết rõ ràng, mạch lạc sau dấu gạch ngang ""-"".
+                    3. Với MỖI sản phẩm được nhắc đến trong danh sách, ngay dưới dòng mô tả văn bản, bạn PHẢI chèn chuỗi JSON của sản phẩm đó nằm giữa thẻ [PRODUCT_CARD] và [/PRODUCT_CARD] ở một dòng riêng biệt.
+
+                    Ví dụ cách trình bày danh sách kiểu khối xen kẽ văn bản để load giao diện:
+                    Dạ shop em xin gợi ý các mẫu đang cực hot bên em để mình tham khảo ạ:
+
+                    1. **Rolex Datejust Nữ** - Thiết kế tinh tế, quý phái dành cho phái đẹp.
+                    [PRODUCT_CARD]{{""id"":78,""name"":""Rolex Datejust Nữ"",""brandName"":""Rolex"",""price"":8800000,""imageUrl"":""rolex-nu.jpg""}}[/PRODUCT_CARD]
+
+                    Anh/chị quan tâm đến dòng đồng hồ nào ở trên hoặc cần em tư vấn thêm tiêu chí nào khác không ạ?
+
+                    * Chú ý cấu trúc thuộc tính JSON bên trong thẻ:
+                    - Tuyệt đối tuân thủ định dạng JSON bên trong thẻ, viết liền mạch trên 1 dòng, giữ đúng tên thuộc tính hệ thống yêu cầu.
+                    - ""id"": Điền chính xác ID từ dữ liệu hệ thống kho thực tế.
+                    - ""name"": Tên chính xác của sản phẩm.
+                    - ""brandName"": Tên thương hiệu của sản phẩm.
+                    - ""price"": Giá tiền kiểu số (không chứa dấu chấm hay ký tự đ).
+                    - ""imageUrl"": Tên file ảnh hoặc đường dẫn ảnh đi kèm từ hệ thống.";
+
+                //  GỌI GEMINI API
+                var payload = new
+                {
+                    contents = contentsList,
+                    systemInstruction = new { parts = new[] { new { text = systemInstruction } } },
+                    generationConfig = new { temperature = 0.3, maxOutputTokens = 2000 }
+                };
+
+                var response = await _httpClient.PostAsJsonAsync(GEMINI_URL, payload);
                 if (!response.IsSuccessStatusCode)
-                    return Json(new { success = false, message = "AI đang bận, vui lòng thử lại." });
-
-                var resContent = await response.Content.ReadAsStringAsync();
-                string aiResponseText = JsonDocument.Parse(resContent).RootElement.GetProperty("message").GetProperty("content").GetString();
-
-                // STEP 4: PHÂN TÁCH BÓC TÁCH ID SẢN PHẨM
-                string botReply = aiResponseText;
-                var recommendedIds = new List<long>();
-
-                var cardMatches = Regex.Matches(aiResponseText, @"\[card_product:\s*(\d+)\s*\]", RegexOptions.IgnoreCase);
-                foreach (Match m in cardMatches)
                 {
-                    if (long.TryParse(m.Groups[1].Value, out long id) && !recommendedIds.Contains(id))
-                        recommendedIds.Add(id);
+                    string errReason = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Gemini lỗi HTTP {response.StatusCode}: {errReason}");
                 }
 
-                // Sửa lỗi ảo giác ID bằng cơ chế quét Tên sản phẩm xuất hiện trong lời thoại
-                var dbProducts = filteredProducts.Where(p => recommendedIds.Contains(p.Id)).ToList();
-                foreach (var p in filteredProducts)
+                string responseString = await response.Content.ReadAsStringAsync();
+                string botReply = "";
+
+                using (JsonDocument doc = JsonDocument.Parse(responseString))
                 {
-                    if (aiResponseText.ToLower().Contains(p.Name.ToLower()) && !dbProducts.Any(x => x.Id == p.Id))
+                    JsonElement root = doc.RootElement;
+                    if (root.TryGetProperty("candidates", out var candidates) && candidates.GetArrayLength() > 0)
                     {
-                        dbProducts.Add(p);
+                        var firstCandidate = candidates[0];
+                        if (firstCandidate.TryGetProperty("content", out var content) && content.TryGetProperty("parts", out var parts))
+                        {
+                            var textParts = new List<string>();
+                            foreach (var part in parts.EnumerateArray())
+                            {
+                                if (part.TryGetProperty("text", out var textElement))
+                                {
+                                    textParts.Add(textElement.GetString() ?? "");
+                                }
+                            }
+                            botReply = string.Join("\n", textParts);
+                        }
                     }
                 }
 
-                // Đóng gói dữ liệu kèm theo trường thương hiệu (brandName) trả về Frontend
-                var mappedProducts = dbProducts.Select(p => new {
-                    id = p.Id,
-                    name = p.Name,
-                    price = p.Price,
-                    brandName = p.Brand?.Name ?? "Chính hãng",
-                    imageUrl = "/images/products/" + p.Images,
-                    url = "/san-pham/" + p.Id
-                }).ToList();
-
-                // STEP 5: SAVE HISTORY
-                _context.Set<ChatHistory>().Add(new ChatHistory
+                if (string.IsNullOrEmpty(botReply))
                 {
-                    SessionId = sessionId,
-                    UserMessage = req.Message,
-                    BotReply = aiResponseText,
+                    throw new Exception($"Gemini trả về cấu trúc trống. Nội dung thô: {responseString}");
+                }
+
+                botReply = Regex.Replace(botReply, @"<think>.*?</think>", "", RegexOptions.Singleline).Trim();
+
+                // Trích xuất danh sách đối tượng phục vụ Frontend
+                var productList = ExtractProductsFromCard(botReply);
+
+                Console.WriteLine("--- DANH SÁCH PRODUCT LIST TRẢ VỀ ---");
+                Console.WriteLine(JsonSerializer.Serialize(productList));
+
+                // LƯU LỊCH SỬ VÀ TRẢ VỀ KẾT QUẢ
+                await _context.ChatHistory.AddAsync(new ChatHistory
+                {
+                    SessionId = req.SessionId,
+                    UserMessage = userMessage,
+                    BotReply = botReply,
                     CreatedAt = DateTime.Now
                 });
                 await _context.SaveChangesAsync();
 
-                return Json(new
+                return Json(new ChatResponse
                 {
-                    success = true,
-                    reply = aiResponseText,
-                    products = mappedProducts
+                    Reply = botReply,
+                    Products = productList
                 });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi hệ thống RAG: " + ex.Message });
+                System.Diagnostics.Debug.WriteLine($"[LỖI HỆ THỐNG]: {ex.Message} \n[VỊ TRÍ]: {ex.StackTrace}");
+
+                return Json(new ChatResponse
+                {
+                    Reply = "Dạ, hệ thống kết nối của em đang gặp chút gián đoạn nhỏ. Anh/chị vui lòng thử gửi lại tin nhắn hoặc đợi em trong giây lát nhé! 🌸"
+                });
             }
         }
 
-        [HttpGet("GetHistory")]
+
+        private bool IsGreeting(string text)
+        {
+
+            string[] keywords = { "hi", "hello", "xin chào", "xin chao", "alo shop" };
+            return keywords.Any(kw => text == kw || text.StartsWith(kw + " "));
+        }
+
+        private bool IsContactInquiry(string text)
+        {
+            string[] keywords = { "địa chỉ", "dia chi", "ở đâu", "cửa hàng", "hotline", "số điện thoại", "liên hệ" };
+            return keywords.Any(kw => text.Contains(kw));
+        }
+
+        /// Thuật toán RAG tối ưu: Ưu tiên bóc tách và khớp chính xác theo Thương hiệu trước
+
+        private async Task<List<ProductModel>> GetProductContextData(string msg)
+        {
+            string msgLower = msg.ToLower().Trim();
+
+            // tìm tên Thương hiệu xuất hiện trong tin nhắn
+            var brands = await _context.Brands.AsNoTracking().ToListAsync();
+            var matchedBrand = brands.FirstOrDefault(b => msgLower.Contains(b.Name.ToLower()));
+
+            if (matchedBrand != null)
+            {
+                return await _context.Products
+                    .Include(p => p.Brand)
+                    .Where(p => p.Brand != null && p.Brand.Id == matchedBrand.Id)
+                    .Take(10) 
+                    .ToListAsync();
+            }
+
+            // Nếu không nhắc đến thương hiệu, tiến hành tách từ khóa tìm kiếm theo tên
+            string[] noiseWords = { "tôi", "muốn", "biết", "về", "sản", "phẩm", "cho", "hỏi", "tìm", "kiếm", "mẫu", "dòng", "xem", "loại", "chi tiết", "giá" };
+            var words = msgLower.Split(new[] { ' ', ',', '.', '-', '/', '?', '!' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Where(w => !noiseWords.Contains(w))
+                                .ToList();
+
+            if (!words.Any())
+                return new List<ProductModel>();
+
+            var query = _context.Products.Include(p => p.Brand).AsNoTracking().AsQueryable();
+            foreach (var word in words)
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(word));
+            }
+
+            return await query.Take(5).ToListAsync();
+        }
+
+        // tạo card sản phẩm 
+        private List<ProductItemDto> ExtractProductsFromCard(string text)
+        {
+            var products = new List<ProductItemDto>();
+            var matches = Regex.Matches(text, @"\[PRODUCT_CARD\](.*?)\[/PRODUCT_CARD\]", RegexOptions.Singleline);
+            foreach (Match match in matches)
+            {
+                try
+                {
+                    string jsonString = match.Groups[1].Value.Trim();
+                    var dto = JsonSerializer.Deserialize<ProductItemDto>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (dto != null)
+                    {
+                        // Chuẩn hóa folder ảnh tĩnh 
+                        if (!string.IsNullOrEmpty(dto.ImageUrl) && !dto.ImageUrl.StartsWith("http") && !dto.ImageUrl.StartsWith("/"))
+                        {
+                            dto.ImageUrl = "/media/products/" + dto.ImageUrl;
+                        }
+                        products.Add(dto);
+                    }
+                }
+                catch { }
+            }
+            return products;
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetHistory(string sessionId)
         {
-            if (string.IsNullOrEmpty(sessionId)) sessionId = "session_default";
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Json(new { success = false, messages = new List<object>() });
+            }
 
-            var data = await _context.Set<ChatHistory>()
-                .Where(c => c.SessionId == sessionId)
-                .OrderBy(c => c.CreatedAt).ToListAsync();
+            // Lấy toàn bộ lịch sử trò chuyện của phiên này, sắp xếp từ cũ đến mới
+            var history = await _context.ChatHistory
+                .Where(h => h.SessionId == sessionId)
+                .OrderBy(h => h.CreatedAt)
+                .ToListAsync();
 
-            var formattedMessages = data.Select(h => {
-                string cleanReply = h.BotReply ?? "";
-                var cardMatches = Regex.Matches(cleanReply, @"\[card_product:\s*(\d+)\s*\]", RegexOptions.IgnoreCase);
-                var historyIds = new List<long>();
-                foreach (Match m in cardMatches)
-                {
-                    if (long.TryParse(m.Groups[1].Value, out long id) && !historyIds.Contains(id))
-                        historyIds.Add(id);
-                }
+            var messages = new List<object>();
+            foreach (var h in history)
+            {
+                // Trích xuất lại danh sách card sản phẩm 
+                var products = ExtractProductsFromCard(h.BotReply);
 
-                var dbHistProducts = _context.Products.Include(p => p.Brand).Where(p => historyIds.Contains(p.Id)).Select(p => new {
-                    id = p.Id,
-                    name = p.Name,
-                    price = p.Price,
-                    brandName = p.Brand != null ? p.Brand.Name : "Chính hãng",
-                    imageUrl = "/images/products/" + p.Images,
-                    url = "/san-pham/" + p.Id
-                }).ToList<object>();
-
-                return new
+                messages.Add(new
                 {
                     userMessage = h.UserMessage,
-                    botReply = cleanReply,
-                    createdAt = h.CreatedAt.ToString("HH:mm"),
-                    products = dbHistProducts
-                };
-            });
+                    botReply = h.BotReply,
+                    products = products,
+                    createdAt = h.CreatedAt.ToString("HH:mm")
+                });
+            }
 
-            return Json(new { success = true, messages = formattedMessages });
+            return Json(new { success = true, messages = messages });
         }
     }
 }

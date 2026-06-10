@@ -47,7 +47,7 @@ namespace ShopDongHo.Controllers
                 if (aiKeywords == null || aiKeywords.Count == 0)
                 {
                     _logger.LogWarning("[CONTROLLER-LOG 3.1] Mảng từ khóa trả về rỗng (0 phần tử). Kích hoạt TempData lỗi.");
-                    TempData["error"] = "KHONG NHAN DIEN DUOC HINH ẢNH TU AI .";
+                    TempData["error"] = "AI không nhận diện được hình ảnh.";
                     return RedirectToAction("Index", "Home");
                 }
 

@@ -74,12 +74,15 @@ namespace ShopDongHo.Controllers
             return View(cartVM);
         }
 
-        
+
         public async Task<IActionResult> AddToCart(long Id)
         {
             ProductModel product = await _dataContext.Products.FindAsync(Id);
+            if (product == null) return NotFound(); // Thêm kiểm tra phòng trường hợp ID bậy
+
             List<CartItemModel> carts = HttpContext.Session.GetJson<List<CartItemModel>>("Cart") ?? new List<CartItemModel>();
             CartItemModel cartItem = carts.Where(c => c.ProductId == Id).FirstOrDefault();
+
             if (cartItem == null)
             {
                 carts.Add(new CartItemModel(product));
@@ -88,9 +91,19 @@ namespace ShopDongHo.Controllers
             {
                 cartItem.Quantity += 1;
             }
-            HttpContext.Session.SetJson("Cart", carts); // lưu dữ liệu carts lên session
-            TempData["success"] = "Added to cart successfully";
-            return Redirect(Request.Headers["Referer"].ToString()); // trả về trang hiện tại
+
+            HttpContext.Session.SetJson("Cart", carts);
+            TempData["success"] = "Thêm vào giỏ hàng thành công";
+
+            // === ĐOẠN CẦN SỬA ĐỂ PHÙ HỢP CHO CẢ CHAT VÀ TRANG CHỦ ===
+            // Kiểm tra xem đây có phải là request AJAX/Fetch gửi lên không
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                Request.Headers["Accept"].ToString().Contains("application/json"))
+            {
+                return Json(new { success = true }); // Trả về JSON cho JavaScript đọc
+            }
+
+            return Redirect(Request.Headers["Referer"].ToString()); // Giữ nguyên cho trang chủ tĩnh
         }
 
         public async Task<IActionResult> Decrease(int Id)
